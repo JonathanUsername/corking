@@ -75,4 +75,4 @@ def give_object_coordinates():
 # 	return Response(json.dumps(generate_desert(1600)),mimetype='application/json')
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=int("5000"))
