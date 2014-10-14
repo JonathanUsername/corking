@@ -1,0 +1,5 @@
+Current ip address:
+46.20.121.70
+
+to test the flask just type
+curl http://46.20.121.70:5000/
