@@ -1,115 +1,86 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {
-    preload: preload,
-    create: create,
-    update: update
-});
+var GAME_WIDTH = 400;
+var GAME_HEIGHT = 400;
+
+
+var game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.CANVAS, 'game-box', { preload: preload, create: create, update: update, render: render });
 
 function preload() {
-    game.load.image('sky', 'sky.png');
-    game.load.image('ground', 'platform.png');
-    game.load.image('star', 'star.png');
-    game.load.spritesheet('dude', 'dude.png', 32, 48);
+
+    game.load.tilemap('desert', 'desert.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.image('tiles', 'tmw_desert_spacing.png');
+
 }
 
+var map;
+var layer;
+
+var marker;
+var currentTile;
+var cursors;
+
 function create() {
-    // THE WORLD
-    //  We're going to be using physics, so enable the Arcade Physics system
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-    game.add.sprite(0, 0, 'sky');
-    //  The platforms group contains the ground and the 2 ledges we can jump on
-    platforms = game.add.group();
-    //  We will enable physics for any object that is created in this group
-    platforms.enableBody = true;
-    // Here we create the ground.
-    var ground = platforms.create(0, game.world.height - 64, 'ground');
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    ground.scale.setTo(2, 2);
-    //  This stops it from falling away when you jump on it
-    ground.body.immovable = true;
-    //  Now let's create two ledges
-    var ledge = platforms.create(400, 400, 'ground');
-    console.log(ledge)
 
-    ledge.body.immovable = true;
+    map = game.add.tilemap('desert');
 
-    ledge = platforms.create(-150, 250, 'ground');
+    map.addTilesetImage('Desert', 'tiles');
 
-    console.log(ledge)
+    currentTile = map.getTile(2, 3);
 
-    ledge.body.immovable = true;
+    layer = map.createLayer('Ground');
 
+    layer.resizeWorld();
 
-    // THE PLAYER
-    // The player and its settings
-    player = game.add.sprite(32, game.world.height - 150, 'dude');
+    marker = game.add.graphics();
+    marker.lineStyle(2, 0x000000, 1);
+    marker.drawRect(0, 0, 32, 32);
 
-    //  We need to enable physics on the player
-    game.physics.arcade.enable(player);
-
-    //  Player physics properties. Give the little guy a slight bounce.
-    player.body.bounce.y = 0.2;
-    player.body.gravity.y = 300;
-    player.body.collideWorldBounds = true;
-
-    //  Our two animations, walking left and right.
-    player.animations.add('left', [0, 1, 2, 3], 10, true);
-    player.animations.add('right', [5, 6, 7, 8], 10, true);
-    player.body.gravity.y = 300;
-    stars = game.add.group();
-
-    stars.enableBody = true;
-
-    //  Here we'll create 12 of them evenly spaced apart
-    for (var i = 0; i < 12; i++) {
-        //  Create a star inside of the 'stars' group
-        var star = stars.create(i * 70, 0, 'star');
-
-        //  Let gravity do its thing
-        star.body.gravity.y = 6;
-
-        //  This just gives each star a slightly random bounce value
-        star.body.bounce.y = 0.7 + Math.random() * 0.2;
-    }
+    cursors = game.input.keyboard.createCursorKeys();
 
 }
 
 function update() {
-    cursors = game.input.keyboard.createCursorKeys();
-    //  Reset the players velocity (movement)
-    player.body.velocity.x = 0;
-    //  Allow the player to jump if they are touching the ground.
-    if (cursors.up.isDown && player.body.touching.down) {
-        console.log("woom")
-        player.body.velocity.y = -350;
+
+    marker.x = layer.getTileX(game.input.activePointer.worldX) * 32;
+    marker.y = layer.getTileY(game.input.activePointer.worldY) * 32;
+
+    if (game.input.mousePointer.isDown)
+    {
+        if (game.input.keyboard.isDown(Phaser.Keyboard.SHIFT))
+        {
+            currentTile = map.getTile(layer.getTileX(marker.x), layer.getTileY(marker.y));
+        }
+        else
+        {
+            if (map.getTile(layer.getTileX(marker.x), layer.getTileY(marker.y)) != currentTile)
+            {
+                map.putTile(currentTile, layer.getTileX(marker.x), layer.getTileY(marker.y))
+            }
+        }
     }
 
-    if (cursors.left.isDown) {
-        //  Move to the left
-        player.body.velocity.x = -150;
-
-        player.animations.play('left');
-    } else if (cursors.right.isDown) {
-        //  Move to the right
-        player.body.velocity.x = 150;
-
-        player.animations.play('right');
-    } else {
-        //  Stand still
-        player.animations.stop();
-
-        player.frame = 4;
+    if (cursors.left.isDown)
+    {
+        game.camera.x -= 4;
     }
-    game.physics.arcade.collide(stars, platforms);
-    game.physics.arcade.overlap(player, stars, collectStar, null, this);
+    else if (cursors.right.isDown)
+    {
+        game.camera.x += 4;
+    }
 
-    //  Collide the player and the stars with the platforms
-    game.physics.arcade.collide(player, platforms);
-
-    function collectStar(player, star) {
-
-        // Removes the star from the screen
-        star.kill();
-
+    if (cursors.up.isDown)
+    {
+        game.camera.y -= 4;
+    }
+    else if (cursors.down.isDown)
+    {
+        game.camera.y += 4;
     }
 
 }
+
+function render() {
+
+    game.debug.text('Left-click to paint. Shift + Left-click to select tile. Arrows to scroll.', 32, 32, '#efefef');
+
+}
+
