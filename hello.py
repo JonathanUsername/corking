@@ -4,8 +4,11 @@ import json
 import random
 import math
 import ipdb
+import os
 app = Flask(__name__)
 app.config['DEBUG'] = True
+current_directory = os.getcwd()
+app._static_folder=current_directory
 
 # Temporary assumptions (to be updated when we can get a json file from the front end).
 screen_width=400
@@ -23,6 +26,9 @@ def check_name(newname):
 def midpoint(length):
 	return length/2
 
+@app.route("/")
+def root():
+	return app.send_static_file('index.html')
 
 @app.route("/newname")
 def new_name():
