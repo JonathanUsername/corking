@@ -5,11 +5,11 @@ import random
 import math
 import ipdb
 import os
-app = Flask(__name__)
+app = Flask(__name__,static_url_path='')
 app.config['DEBUG'] = True
 #current_directory = os.getcwd()
 #app._static_folder=current_directory
-app._static_folder=/home/jon/corking/
+app._static_folder="/home/jon/corking/"
 # Temporary assumptions (to be updated when we can get a json file from the front end).
 screen_width=400
 screen_height=400
