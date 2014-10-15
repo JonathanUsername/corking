@@ -1,6 +1,8 @@
 #!/usr/bin/python
 from flask import Flask, request, abort, Response, jsonify, make_response, current_app, g
 import json
+import random
+import math
 import ipdb
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -11,7 +13,7 @@ screen_height=400
 no_tiles=1600
 
 def generate_desert(size):
-	return [30 for i in range(size)]
+	return [int(math.ceil(48*random.random())) for i in range(size)]
 
 def check_name(newname):
 	# Later on add a database access to see if the name is already taken
@@ -75,4 +77,4 @@ def give_object_coordinates():
 # 	return Response(json.dumps(generate_desert(1600)),mimetype='application/json')
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int("80"))
+    app.run(host="0.0.0.0", port=int("5000"))
