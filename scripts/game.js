@@ -71,7 +71,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             map = game.add.tilemap('desert');
         } else {
             game.load.tilemap('desert2', data, null, Phaser.Tilemap.TILED_JSON);
-            map = game.add.tilemap('desert2);
+            map = game.add.tilemap('desert2');
         }
 
     }
