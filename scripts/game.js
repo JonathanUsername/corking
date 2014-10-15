@@ -70,8 +70,8 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         if (loaded_game == false && !data) {
             map = game.add.tilemap('desert');
         } else {
-            game.load.tilemap('desert', data, null, Phaser.Tilemap.TILED_JSON);
-            map = game.add.tilemap(data);
+            game.load.tilemap('desert2', data, null, Phaser.Tilemap.TILED_JSON);
+            map = game.add.tilemap('desert2);
         }
 
     }
