@@ -1,16 +1,14 @@
-
-
 var app = {}
 
 requirejs.config({
-  baseUrl: 'scripts',
-  paths: {
-    Phaser: 'phaser',
-    jquery: 'jquery'
-  },
+    baseUrl: 'scripts',
+    paths: {
+        Phaser: 'phaser',
+        jquery: 'jquery'
+    },
 });
 
-require(['Phaser','jquery'], function(Phaser, $){
+require(['Phaser', 'jquery'], function(Phaser, $) {
     var GAME_WIDTH = 400;
     var GAME_HEIGHT = 400;
 
@@ -37,9 +35,19 @@ require(['Phaser','jquery'], function(Phaser, $){
     var currentTile;
     var cursors;
 
+    var loaded_game = false;
+
+    munch = function() {
+        $.get("/newgame", function(data){
+            loaded_game = data;
+            console.log(data)
+        }).done(create)
+    }
+
+
     function create() {
 
-        map = game.add.tilemap('desert');
+        world_builder();
 
         map.addTilesetImage('Desert', 'tiles');
 
@@ -54,6 +62,16 @@ require(['Phaser','jquery'], function(Phaser, $){
         marker.drawRect(0, 0, 32, 32);
 
         cursors = game.input.keyboard.createCursorKeys();
+        console.log(Phaser.Keyboard.ctrlKey)
+    }
+
+    function world_builder(data) {
+
+        if (loaded_game == false && !data) {
+            map = game.add.tilemap('desert');
+        } else {
+            map = game.add.tilemap(data);
+        }
 
     }
 
