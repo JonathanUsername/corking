@@ -1,4 +1,3 @@
-
 requirejs.config({
     baseUrl: 'scripts',
     paths: {
@@ -12,23 +11,37 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
     var GAME_WIDTH = 400;
     var GAME_HEIGHT = 500;
     var map,
-    layer,
-    marker,
-    currentTile,
-    cursors,
-    game,
-    Buildings,
-    loaded_game = false;
+        layer,
+        marker,
+        currentTile,
+        cursors,
+        game,
+        Buildings,
+        savedLayerOnEndTurn,
+        loadedLayer,
+        loaded_game = false;
+
+    function stripCircular() {
+        var obj = []
+        for (var i in mapdata) {
+            for (var j in mapdata[i]) {
+                // Get rid of circular properties
+                savedLayerOnEndTurn = mapdata[i][j].layer;
+                mapdata[i][j].collisionCallbackContext = null;
+                obj.push(mapdata[i][j])
+            }
+        }
+        return obj
+    }
 
     get_new_game = function() {
-        $.get("/newgame", function(data){
+        $.get("/newgame", function(data) {
             loaded_game = data;
             console.log(JSON.stringify(data))
             try {
                 game.destroy()
                 console.log("Loading new game")
-            }
-            catch(e) {
+            } catch (e) {
                 console.log("Game starting")
             }
             start_game(data)
@@ -37,37 +50,28 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
 
     get_new_game();
 
-    end_turn = function(mapdata){
-        var obj = []
-        for (var i in mapdata){
-            for (var j in mapdata[i]){
-                // Get rid of circular properties
-                mapdata[i][j].layer = null
-                mapdata[i][j].collisionCallbackContext = null
-                obj.push(mapdata[i][j])
-            }
-        }
-        var jsonSave = JSON.stringify(obj)
+    end_turn = function(mapdata) {
+        array = stripCircular(mapdata)
+        var jsonSave = JSON.stringify(array)
         $.ajax({
             url: "/endturn",
             type: "POST",
             data: jsonSave,
-            success: function(data){
+            success: function(data) {
                 loaded_game = data;
                 console.log(JSON.stringify(data))
                 try {
                     game.destroy()
                     console.log("Loading new game")
-                }
-                catch(e) {
+                } catch (e) {
                     console.log("Game starting")
                 }
-                start_game(data)
+                loadedLayer = data;
             }
         })
     }
 
-    start_game = function(loaded){
+    start_game = function(loaded) {
         game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, '', {
             preload: preload,
             create: create,
@@ -92,57 +96,54 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             residence = buildings.getTile(2, 0);
             map.addTilesetImage('Desert', 'tiles');
             currentTile = map.getTile(17, 16);
-            Ground = map.createLayer('Ground');
-            Ground.resizeWorld();
-            Buildings = map.createLayer("Buildings");
+            CurrentMap = map.createLayer('Ground');
+            CurrentMap.resizeWorld();
+            Buildings = map.createBlankLayer("Buildings");
             console.log(Buildings)
             marker = game.add.graphics();
             marker.lineStyle(2, 0x000000, 1);
             marker.drawRect(0, 0, 32, 32);
             cursors = game.input.keyboard.createCursorKeys();
             restart_key = game.input.keyboard.addKey(Phaser.Keyboard.Q);
-            restart_key.onDown.add(function(){
+            restart_key.onDown.add(function() {
                 get_new_game();
             }, this);
             end_turn_key = game.input.keyboard.addKey(Phaser.Keyboard.E);
-            end_turn_key.onDown.add(function(){
+            end_turn_key.onDown.add(function() {
                 mapdata = map.layers[0].data
-                debugger
                 end_turn(mapdata);
             }, this);
             debug_key = game.input.keyboard.addKey(Phaser.Keyboard.A);
-            debug_key.onDown.add(function(){
+            debug_key.onDown.add(function() {
                 GAME_WIDTH = 1200;
                 GAME_HEIGHT = 1200;
                 get_new_game();
-            }, this);            
+            }, this);
             game.camera.x = 800 / 2; // Change this to what the maximum array size is in loaded data
             game.camera.y = 800 / 2;
         }
 
         function update() {
-            marker.x = Ground.getTileX(game.input.activePointer.worldX) * 32;
-            marker.y = Ground.getTileY(game.input.activePointer.worldY) * 32;
+            marker.x = CurrentMap.getTileX(game.input.activePointer.worldX) * 32;
+            marker.y = CurrentMap.getTileY(game.input.activePointer.worldY) * 32;
             if (game.input.mousePointer.isDown) {
                 // Within Buildings, not the ground layer
-                console.log(Ground)
-                var xt = Ground.getTileX(marker.x)
-                var yt = Ground.getTileY(marker.y)
-                currentTile = map.getTile(xt, yt);
-                console.log(currentTile)
-                if (!currentTile.properties.built){
+                console.log(CurrentMap)
+                var xt = CurrentMap.getTileX(marker.x)
+                var yt = CurrentMap.getTileY(marker.y)
+                currentTile = map.getTile(xt, yt, CurrentMap);
+                if (currentTile == null || !currentTile.properties.built) {
                     // Holding shift
                     if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
                         console.log("painting solar")
-                        map.putTile(solar_panel, xt, yt)
+                        map.putTile(solar_panel, xt, yt, CurrentMap)
                         currentTile.properties.built = true;
                     } else if (game.input.keyboard.isDown(Phaser.Keyboard.R)) {
                         console.log("painting residence")
-                        map.putTile(residence, xt, yt)
+                        map.putTile(residence, xt, yt, CurrentMap)
                         currentTile.properties.built = true;
                     } else {
-                        // Just clicking
-                        map.putTile(desert, xt, yt)
+                        console.log(currentTile)
                     }
                 } else {
                     marker.lineStyle(2, 0xffffff, 1);
@@ -166,7 +167,6 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         function render() {
             game.debug.text('Q = Restart\nR = Residence\nS = Solar', 32, 32, '#efefef');
         }
-
 
     }
 });
