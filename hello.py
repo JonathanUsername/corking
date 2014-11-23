@@ -13,11 +13,14 @@ app.config['DEBUG'] = True
 screen_width=400
 screen_height=400
 no_tiles=1600
+WIDTH = 40
+HEIGHT = 40
 DESERT = 30
 SOLAR = 22
 RESIDENT = 23
 
 def generate_desert(size):
+    #ipdb.set_trace()
     desertmap = []
     for i in range(size):
         desertmap.append(DESERT)
@@ -25,10 +28,12 @@ def generate_desert(size):
     #   S|R
     #   -+-
     #   R|S
-    desertmap[no_tiles/2] = SOLAR
-    desertmap[no_tiles/2 + 1 ] = RESIDENT
-    desertmap[no_tiles/2 + screen_width] = RESIDENT
-    desertmap[no_tiles/2 + screen_width + 1] = SOLAR
+    row_length = 1
+    center = midpoint(WIDTH)+midpoint(WIDTH*HEIGHT)
+    desertmap[center] = SOLAR
+    desertmap[center + 1] = RESIDENT
+    desertmap[center + WIDTH] = RESIDENT
+    desertmap[center + WIDTH + 1] = SOLAR
 
     return desertmap
             
@@ -56,16 +61,16 @@ def new_name():
 
 @app.route("/newgame")
 def give_object_coordinates():
-    js = { "height":40,
+    js = { "height":HEIGHT,
          "layers":[
                 {
          "data" : generate_desert(no_tiles),
-         "height":40,
+         "height":HEIGHT,
                  "name":"Ground",
                  "opacity":1,
                  "type":"tilelayer",
                  "visible":True,
-                 "width":40,
+                 "width":WIDTH,
                  "x":0,
                  "y":0
                 }],"orientation":"orthogonal",
@@ -90,7 +95,7 @@ def give_object_coordinates():
                         }],
         "tilewidth":32,
         "version":1,
-        "width":40
+        "width":WIDTH
         }
     return Response(json.dumps(js), mimetype='application/json')
 
