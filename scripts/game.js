@@ -19,7 +19,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
     game,
     loaded_game = false;
 
-    munch = function() {
+    get_new_game = function() {
         $.get("/newgame", function(data){
             loaded_game = data;
             console.log(JSON.stringify(data))
@@ -33,6 +33,8 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             start_game(data)
         })
     }
+
+    get_new_game();
 
     start_game = function(loaded){
         game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, '', {
@@ -64,7 +66,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             cursors = game.input.keyboard.createCursorKeys();
             restart_key = game.input.keyboard.addKey(Phaser.Keyboard.R);
             restart_key.onDown.add(function(){
-                munch();
+                get_new_game();
             }, this);
         }
 
@@ -99,6 +101,6 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             game.debug.text('Left-click to paint. Shift + Left-click to select tile. Arrows to scroll.', 32, 32, '#efefef');
         }
 
-        munch()
+
     }
 });
