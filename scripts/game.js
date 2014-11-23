@@ -8,7 +8,7 @@ requirejs.config({
 
 require(['Phaser', 'jquery'], function(Phaser, $) {
     app = {}
-    var GAME_WIDTH = 400;
+    var GAME_WIDTH = 600;
     var GAME_HEIGHT = 500;
     var map,
         layer,
@@ -27,6 +27,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             for (var j in mapdata[i]) {
                 // Get rid of circular properties
                 savedLayerOnEndTurn = mapdata[i][j].layer;
+                mapdata[i][j].layer = null;
                 mapdata[i][j].collisionCallbackContext = null;
                 obj.push(mapdata[i][j])
             }

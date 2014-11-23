@@ -10,12 +10,31 @@ app.config['DEBUG'] = True
 #current_directory = os.getcwd()
 #app._static_folder=current_directory
 # Temporary assumptions (to be updated when we can get a json file from the front end).
-screen_width=400
-screen_height=400
 no_tiles=1600
+WIDTH = 40
+HEIGHT=40
+DESERT = 30
+SOLAR = 22
+RESIDENT = 23
 
 def generate_desert(size):
-	return [int(math.ceil(48*random.random())) for i in range(size)]
+    desertmap = []
+    for i in range(size):
+        desertmap.append(DESERT)
+    # Add the initial solar panels
+    #   S|R
+    #   -+-
+    #   R|S
+    row_length = 1
+    center = midpoint(WIDTH)+midpoint(WIDTH*HEIGHT)
+    desertmap[center] = SOLAR
+    desertmap[center + 1 ] = RESIDENT
+    desertmap[center + WIDTH] = RESIDENT
+    desertmap[center + WIDTH + 1] = SOLAR
+
+    return desertmap
+            
+                
 
 def check_name(newname):
 	# Later on add a database access to see if the name is already taken
