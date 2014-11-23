@@ -94,7 +94,8 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             currentTile = map.getTile(17, 16);
             Ground = map.createLayer('Ground');
             Ground.resizeWorld();
-            Buildings = map.createLayer("Buildings");
+            var jimjam = map.createLayer("Buildings");
+            console.log(jimjam)
             marker = game.add.graphics();
             marker.lineStyle(2, 0x000000, 1);
             marker.drawRect(0, 0, 32, 32);
@@ -111,8 +112,8 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             }, this);
             debug_key = game.input.keyboard.addKey(Phaser.Keyboard.A);
             debug_key.onDown.add(function(){
-                GAME_WIDTH = 800 * 32;
-                GAME_HEIGHT = 800 * 32;
+                GAME_WIDTH = 1200;
+                GAME_HEIGHT = 1200;
                 get_new_game();
             }, this);            
             game.camera.x = 800 / 2; // Change this to what the maximum array size is in loaded data
@@ -124,7 +125,6 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             marker.y = Ground.getTileY(game.input.activePointer.worldY) * 32;
             if (game.input.mousePointer.isDown) {
                 // Within Buildings, not the ground layer
-                console.log(Buildings)
                 console.log(Ground)
                 var xt = Buildings.getTileX(marker.x)
                 var yt = Buildings.getTileY(marker.y)
