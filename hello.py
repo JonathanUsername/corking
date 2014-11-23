@@ -1,15 +1,14 @@
 #!/usr/bin/python
-from flask import Flask, request, abort, Response, jsonify, make_response, current_app, g
+from flask import Flask, request, abort, Response, jsonify, make_response, current_app, g, render_template
 import json
 import random
 import math
 import ipdb
 import os
-app = Flask(__name__,static_url_path='')
+app = Flask(__name__, static_folder='', static_url_path='')
 app.config['DEBUG'] = True
 #current_directory = os.getcwd()
 #app._static_folder=current_directory
-app._static_folder="/home/jon/corking/"
 # Temporary assumptions (to be updated when we can get a json file from the front end).
 screen_width=400
 screen_height=400
@@ -28,7 +27,7 @@ def midpoint(length):
 
 @app.route("/")
 def root():
-	return app.send_static_file('index.html')
+	return render_template("index.html")
 
 @app.route("/newname")
 def new_name():
@@ -38,7 +37,7 @@ def new_name():
 
 @app.route("/newgame")
 def give_object_coordinates():
-	js = [ { "height":40,
+	js = { "height":40,
  		"layers":[
         {
 		 "data" : generate_desert(no_tiles),
@@ -73,7 +72,7 @@ def give_object_coordinates():
 		"tilewidth":32,
 		"version":1,
 		"width":40
-		} ]
+		}
 	return Response(json.dumps(js), mimetype='application/json')
 
 
