@@ -20,9 +20,16 @@ RESIDENT = 23
 def generate_desert(size):
     desertmap = []
     for i in range(size):
-        if( i < (size/2)): tile = DESERT
-        else: tile = SOLAR
-        desertmap.append(tile)
+        desertmap.append(DESERT)
+    # Add the initial solar panels
+    #   S|R
+    #   -+-
+    #   R|S
+    desertmap[no_tiles/2] = SOLAR
+    desertmap[no_tiles/2 + 1 ] = RESIDENT
+    desertmap[no_tiles/2 + screen_width] = RESIDENT
+    desertmap[no_tiles/2 + screen_width + 1] = SOLAR
+
     return desertmap
             
                 
