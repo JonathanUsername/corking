@@ -104,8 +104,11 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             end_turn_key = game.input.keyboard.addKey(Phaser.Keyboard.E);
             end_turn_key.onDown.add(function(){
                 mapdata = map.layers[0].data
+                debugger
                 end_turn(mapdata);
             }, this);
+            game.camera.x = 800 / 2
+            game.camera.y = 800 / 2
         }
 
         function update() {
