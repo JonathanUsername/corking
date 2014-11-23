@@ -98,5 +98,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         function render() {
             game.debug.text('Left-click to paint. Shift + Left-click to select tile. Arrows to scroll.', 32, 32, '#efefef');
         }
+
+        munch()
     }
 });
