@@ -10,6 +10,8 @@ app.config['DEBUG'] = True
 #current_directory = os.getcwd()
 #app._static_folder=current_directory
 # Temporary assumptions (to be updated when we can get a json file from the front end).
+screen_width=400
+screen_height=400
 no_tiles=1600
 WIDTH = 40
 HEIGHT = 40
@@ -35,7 +37,9 @@ def generate_desert(size):
 
     return desertmap
             
-  
+                
+            
+                    
 
 def check_name(newname):
     # Later on add a database access to see if the name is already taken

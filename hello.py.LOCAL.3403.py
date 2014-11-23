@@ -10,6 +10,8 @@ app.config['DEBUG'] = True
 #current_directory = os.getcwd()
 #app._static_folder=current_directory
 # Temporary assumptions (to be updated when we can get a json file from the front end).
+screen_width=400
+screen_height=400
 no_tiles=1600
 WIDTH = 40
 HEIGHT = 40
@@ -17,7 +19,7 @@ DESERT = 30
 SOLAR = 22
 RESIDENT = 23
 
-def generate_desert(size):
+def get_map(size):
     #ipdb.set_trace()
     desertmap = []
     for i in range(size):
@@ -35,7 +37,9 @@ def generate_desert(size):
 
     return desertmap
             
-  
+                
+            
+                    
 
 def check_name(newname):
     # Later on add a database access to see if the name is already taken
@@ -60,7 +64,7 @@ def give_object_coordinates():
     js = { "height":HEIGHT,
          "layers":[
                 {
-         "data" : generate_desert(no_tiles),
+         "data" : get_map(no_tiles),
          "height":HEIGHT,
                  "name":"Ground",
                  "opacity":1,
@@ -99,7 +103,7 @@ def give_object_coordinates():
 
 # @app.route("/test")
 # def test():
-#     return Response(json.dumps(generate_desert(1600)),mimetype='application/json')
+#     return Response(json.dumps(get_map(1600)),mimetype='application/json')
 
 if __name__ == "__main__":
         app.run(host="0.0.0.0", port=int("5000"))
