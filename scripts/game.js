@@ -17,6 +17,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
     currentTile,
     cursors,
     game,
+    Buildings,
     loaded_game = false;
 
     get_new_game = function() {
@@ -91,8 +92,9 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             residence = buildings.getTile(2, 0);
             map.addTilesetImage('Desert', 'tiles');
             currentTile = map.getTile(17, 16);
-            layer = map.createLayer('Ground');
-            layer.resizeWorld();
+            Ground = map.createLayer('Ground');
+            Ground.resizeWorld();
+            Buildings = map.createLayer("Buildings");
             marker = game.add.graphics();
             marker.lineStyle(2, 0x000000, 1);
             marker.drawRect(0, 0, 32, 32);
@@ -107,16 +109,25 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
                 debugger
                 end_turn(mapdata);
             }, this);
-            game.camera.x = 800 / 2
-            game.camera.y = 800 / 2
+            debug_key = game.input.keyboard.addKey(Phaser.Keyboard.A);
+            debug_key.onDown.add(function(){
+                GAME_WIDTH = 800 * 32;
+                GAME_HEIGHT = 800 * 32;
+                get_new_game();
+            }, this);            
+            game.camera.x = 800 / 2; // Change this to what the maximum array size is in loaded data
+            game.camera.y = 800 / 2;
         }
 
         function update() {
-            marker.x = layer.getTileX(game.input.activePointer.worldX) * 32;
-            marker.y = layer.getTileY(game.input.activePointer.worldY) * 32;
+            marker.x = Ground.getTileX(game.input.activePointer.worldX) * 32;
+            marker.y = Ground.getTileY(game.input.activePointer.worldY) * 32;
             if (game.input.mousePointer.isDown) {
-                var xt = layer.getTileX(marker.x)
-                var yt = layer.getTileY(marker.y)
+                // Within Buildings, not the ground layer
+                console.log(Buildings)
+                console.log(Ground)
+                var xt = Buildings.getTileX(marker.x)
+                var yt = Buildings.getTileY(marker.y)
                 currentTile = map.getTile(xt, yt);
                 console.log(currentTile)
                 if (!currentTile.properties.built){
@@ -125,20 +136,13 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
                         console.log("painting solar")
                         map.putTile(solar_panel, xt, yt)
                         currentTile.properties.built = true;
-                        // currentTile = map.getTile(xt, yt);
-                        // console.log(currentTile)
                     } else if (game.input.keyboard.isDown(Phaser.Keyboard.R)) {
                         console.log("painting residence")
                         map.putTile(residence, xt, yt)
                         currentTile.properties.built = true;
-                        // currentTile = map.getTile(xt, yt);
-                        // console.log(currentTile)
                     } else {
                         // Just clicking
                         map.putTile(desert, xt, yt)
-                        // if (map.getTile(xt, yt) != currentTile) {
-                        //     map.putTile(currentTile, layer.getTileX(marker.x), layer.getTileY(marker.y))
-                        // }
                     }
                 } else {
                     marker.lineStyle(2, 0xffffff, 1);
