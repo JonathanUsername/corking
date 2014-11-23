@@ -10,7 +10,7 @@ requirejs.config({
 require(['Phaser', 'jquery'], function(Phaser, $) {
     app = {}
     var GAME_WIDTH = 400;
-    var GAME_HEIGHT = 400;
+    var GAME_HEIGHT = 500;
     var map,
     layer,
     marker,
@@ -45,7 +45,8 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         function preload() {
             var url = (loaded) ? null : 'data/desert.json';
             var data = loaded || null;
-            console.log(url,data)
+            console.log(url)
+            console.log(data)
             //debugger
             game.load.tilemap('desert', url, data, Phaser.Tilemap.TILED_JSON);
             game.load.image('tiles', 'tmw_desert_spacing.png');
@@ -61,6 +62,10 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             marker.lineStyle(2, 0x000000, 1);
             marker.drawRect(0, 0, 32, 32);
             cursors = game.input.keyboard.createCursorKeys();
+            restart_key = game.input.keyboard.addKey(Phaser.Keyboard.R);
+            restart_key.onDown.add(function(){
+                munch();
+            }, this);
         }
 
         function update() {
@@ -76,6 +81,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
                     }
                 }
             }
+
             if (cursors.left.isDown) {
                 game.camera.x -= 4;
             } else if (cursors.right.isDown) {
