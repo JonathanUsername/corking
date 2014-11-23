@@ -47,15 +47,18 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         function preload() {
             var url = (loaded) ? null : 'data/desert.json';
             var data = loaded || null;
-            console.log(url)
-            console.log(data)
             //debugger
             game.load.tilemap('desert', url, data, Phaser.Tilemap.TILED_JSON);
+            game.load.tilemap('buildings', 'data/buildings.json', null, Phaser.Tilemap.TILED_JSON);
             game.load.image('tiles', 'tmw_desert_spacing.png');
         }
 
         function create() {
             map = game.add.tilemap('desert');
+            buildings = game.add.tilemap('buildings');
+            desert = buildings.getTile(0, 0);
+            solar_panel = buildings.getTile(1, 0);
+            residence = buildings.getTile(2, 0);
             map.addTilesetImage('Desert', 'tiles');
             currentTile = map.getTile(17, 16);
             layer = map.createLayer('Ground');
@@ -64,7 +67,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             marker.lineStyle(2, 0x000000, 1);
             marker.drawRect(0, 0, 32, 32);
             cursors = game.input.keyboard.createCursorKeys();
-            restart_key = game.input.keyboard.addKey(Phaser.Keyboard.R);
+            restart_key = game.input.keyboard.addKey(Phaser.Keyboard.Q);
             restart_key.onDown.add(function(){
                 get_new_game();
             }, this);
@@ -74,13 +77,23 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             marker.x = layer.getTileX(game.input.activePointer.worldX) * 32;
             marker.y = layer.getTileY(game.input.activePointer.worldY) * 32;
             if (game.input.mousePointer.isDown) {
-                if (game.input.keyboard.isDown(Phaser.Keyboard.SHIFT)) {
-                    currentTile = map.getTile(layer.getTileX(marker.x), layer.getTileY(marker.y));
-                    console.log(currentTile)
+                // Holding shift
+                if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
+                    console.log("painting solar")
+                    map.putTile(solar_panel, layer.getTileX(marker.x), layer.getTileY(marker.y))
+                    // currentTile = map.getTile(layer.getTileX(marker.x), layer.getTileY(marker.y));
+                    // console.log(currentTile)
+                } else if (game.input.keyboard.isDown(Phaser.Keyboard.R)) {
+                    console.log("painting residence")
+                    map.putTile(residence, layer.getTileX(marker.x), layer.getTileY(marker.y))
+                    // currentTile = map.getTile(layer.getTileX(marker.x), layer.getTileY(marker.y));
+                    // console.log(currentTile)
                 } else {
-                    if (map.getTile(layer.getTileX(marker.x), layer.getTileY(marker.y)) != currentTile) {
-                        map.putTile(currentTile, layer.getTileX(marker.x), layer.getTileY(marker.y))
-                    }
+                    // Just clicking
+                    map.putTile(desert, layer.getTileX(marker.x), layer.getTileY(marker.y))
+                    // if (map.getTile(layer.getTileX(marker.x), layer.getTileY(marker.y)) != currentTile) {
+                    //     map.putTile(currentTile, layer.getTileX(marker.x), layer.getTileY(marker.y))
+                    // }
                 }
             }
 
@@ -98,7 +111,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         }
 
         function render() {
-            game.debug.text('Left-click to paint. Shift + Left-click to select tile. Arrows to scroll.', 32, 32, '#efefef');
+            game.debug.text('Q = Restart\nR = Residence\nS = Solar', 32, 32, '#efefef');
         }
 
 
