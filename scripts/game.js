@@ -94,8 +94,8 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             currentTile = map.getTile(17, 16);
             Ground = map.createLayer('Ground');
             Ground.resizeWorld();
-            var jimjam = map.createLayer("Buildings");
-            console.log(jimjam)
+            Buildings = map.createLayer("Buildings");
+            console.log(Buildings)
             marker = game.add.graphics();
             marker.lineStyle(2, 0x000000, 1);
             marker.drawRect(0, 0, 32, 32);
@@ -126,8 +126,8 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             if (game.input.mousePointer.isDown) {
                 // Within Buildings, not the ground layer
                 console.log(Ground)
-                var xt = Buildings.getTileX(marker.x)
-                var yt = Buildings.getTileY(marker.y)
+                var xt = Ground.getTileX(marker.x)
+                var yt = Ground.getTileY(marker.y)
                 currentTile = map.getTile(xt, yt);
                 console.log(currentTile)
                 if (!currentTile.properties.built){
