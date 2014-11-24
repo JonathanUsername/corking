@@ -118,13 +118,6 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             game.camera.x = 800 / 2; // Change this to what the maximum array size is in loaded data
             game.camera.y = 800 / 2;
 
-            // to be removed
-            HUDtext = game.add.text(game.camera.x, game.camera.y, "Solar Power: 100", {
-                font: "15px Arial",
-                fill: "#ff0000",
-                align: "center"
-            });
-
             HUD = new HUDvm();
             ko.applyBindings(HUD);
         }
@@ -172,15 +165,11 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                 map.putTile(b_tile, x, y, layer);
                 tile.properties.built = true;
                 HUD.solar_power(HUD.solar_power() - cost);
-                updateHUD();
             } else {
                 console.log("NOT ENOUGH POWER")
             }
         }
 
-        function updateHUD() {
-            HUDtext.setText("Solar power : " + HUD.solar_power())
-        }
 
         function end_turn(mapdata) {
             obj = {};
