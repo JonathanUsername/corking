@@ -15,7 +15,7 @@ WIDTH = 40
 HEIGHT = 40
 DESERT = 30
 SOLAR = 22
-RESIDENT = 23
+RESIDENCE = 23
 
 def get_map(size):
     #ipdb.set_trace()
@@ -29,8 +29,8 @@ def get_map(size):
     row_length = 1
     center = midpoint(WIDTH)+midpoint(WIDTH*HEIGHT)
     map[center] = SOLAR
-    map[center + 1] = RESIDENT
-    map[center + WIDTH] = RESIDENT
+    map[center + 1] = RESIDENCE
+    map[center + WIDTH] = RESIDENCE
     map[center + WIDTH + 1] = SOLAR
 
     return map
@@ -53,8 +53,10 @@ def root():
 def end_turn():
     obj = {}
     data = request.json
-    data['solar_power'] = replenishPower(data['solar_power'], data['map'])
-    print data
+    data['solar_power'] = calcPower(data['solar_power'], data['map'])
+    popObj = calcPop(data['population'], data['map'], data['max_population'])
+    data['population'] = popObj['population']
+    data['max_population'] = popObj['max_population']
     return json.dumps(data)
 
 @app.route("/newgame")
@@ -99,14 +101,33 @@ def give_object_coordinates():
     return Response(json.dumps(js), mimetype='application/json')
 
 
-def replenishPower(amount,map_array):
+def calcPower(amount,map_array):
     panels = 0
     for i,v in enumerate(map_array):
-        print i
-        if map_array[i] == 22:
+        if map_array[i] == SOLAR:
             panels += 1
     return amount + (panels * 10) 
 
+def calcPop(population,map_array,current_max):
+    residences = 0
+    obj = { 
+        'max_population': 0, 
+        'population': 0 
+    }
+    for i,v in enumerate(map_array):
+        if map_array[i] == RESIDENCE:
+            residences += 1
+    obj['max_population'] = (residences * 4)
+    obj['population'] = randomIncrease(population)
+    return obj
+
+def randomIncrease(current):
+    #reasonable_max = current / 5
+    inc = random.randint(current, current + 3)
+    return inc 
+
+def percentof(whole, amount):
+    return amount * (float(whole)/100 )
 
 # @app.route("/test")
 # def test():

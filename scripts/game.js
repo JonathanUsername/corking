@@ -68,7 +68,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         function preload() {
             var url = (loaded) ? null : 'data/desert.json';
             var data = loaded || null;
-            TURN = data.turn
+            TURN = data.turns
                 //debugger
             game.load.tilemap('desert', url, data, Phaser.Tilemap.TILED_JSON);
             game.load.tilemap('buildings', 'data/buildings.json', null, Phaser.Tilemap.TILED_JSON);
@@ -181,6 +181,8 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             }
             obj.turn = TURN;
             obj.solar_power = HUD.solar_power();
+            obj.population = HUD.population();
+            obj.max_population = HUD.max_population();
             var jsonSave = JSON.stringify(obj, null, '\t');
             $.ajax({
                 url: "/endturn",
@@ -191,6 +193,8 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                     json = JSON.parse(data)
                     loadedLayer = json.map;
                     HUD.solar_power(json.solar_power)
+                    HUD.population(json.population)
+                    HUD.max_population(json.max_population)
                     console.log("Loading new game")
                 }
             })
@@ -201,10 +205,14 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         }
 
         // use this for all resources or turns or anything that needs to bind to the view
-        // it is a global variable called HUD
+        // it is a global variable called HUD, at the moment it doesn't compute anything
+        // since we leave all that to the backend. This means max pop won't update til 
+        // turn end, for instance.. 
         function HUDvm (){
             var self = this;
             self.solar_power = ko.observable(100);
+            self.population = ko.observable(4);
+            self.max_population = ko.observable(8);
         }
 
 
