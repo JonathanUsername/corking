@@ -10,6 +10,8 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
     app = {}
     var GAME_WIDTH = 600;
     var GAME_HEIGHT = 500;
+    var solar_power = 100;
+    var BUILDING_INFO = {}
     var map,
         layer,
         marker,
@@ -52,8 +54,10 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
     get_new_game();
 
     end_turn = function(mapdata) {
-        array = stripCircular(mapdata)
-        var jsonSave = JSON.stringify(array)
+        obj = {};
+        obj.map = stripCircular(mapdata);
+        obj.solar_power = solar_power;
+        var jsonSave = JSON.stringify(obj);
         $.ajax({
             url: "/endturn",
             type: "POST",
@@ -93,14 +97,22 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             map = game.add.tilemap('desert');
             buildings = game.add.tilemap('buildings');
             desert = buildings.getTile(0, 0);
-            solar_panel = buildings.getTile(1, 0);
-            residence = buildings.getTile(2, 0);
             map.addTilesetImage('Desert', 'tiles');
             currentTile = map.getTile(17, 16);
             CurrentMap = map.createLayer('Ground');
             CurrentMap.resizeWorld();
-            Buildings = map.createBlankLayer("Buildings");
-            console.log(Buildings)
+            // Buildings = map.createBlankLayer("Buildings");
+            // console.log(Buildings)
+            BUILDING_INFO = {
+                "solar_panel": {
+                    tile: buildings.getTile(1, 0),
+                    power_cost: 30
+                },
+                "residence": {
+                    tile: buildings.getTile(2, 0),
+                    power_cost: 40
+                }
+            }
             marker = game.add.graphics();
             marker.lineStyle(2, 0x000000, 1);
             marker.drawRect(0, 0, 32, 32);
@@ -122,6 +134,12 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             }, this);
             game.camera.x = 800 / 2; // Change this to what the maximum array size is in loaded data
             game.camera.y = 800 / 2;
+
+            HUDtext = game.add.text(game.camera.x, game.camera.y, "Solar Power: 100", {
+                font: "15px Arial",
+                fill: "#ff0000",
+                align: "center"
+            });
         }
 
         function update() {
@@ -136,13 +154,9 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
                 if (currentTile == null || !currentTile.properties.built) {
                     // Holding shift
                     if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
-                        console.log("painting solar")
-                        map.putTile(solar_panel, xt, yt, CurrentMap)
-                        currentTile.properties.built = true;
+                        placeBuilding(xt, yt, currentTile, CurrentMap, "solar_panel")
                     } else if (game.input.keyboard.isDown(Phaser.Keyboard.R)) {
-                        console.log("painting residence")
-                        map.putTile(residence, xt, yt, CurrentMap)
-                        currentTile.properties.built = true;
+                        placeBuilding(xt, yt, currentTile, CurrentMap, "residence")
                     } else {
                         console.log(currentTile)
                     }
@@ -164,6 +178,24 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
                 game.camera.y += 4;
             }
         }
+
+        function placeBuilding(x, y, tile, layer, building) {
+            var cost = BUILDING_INFO[building]["power_cost"]
+            var b_tile = BUILDING_INFO[building]["tile"]
+            if (cost <= solar_power) {
+                map.putTile(b_tile, x, y, layer);
+                tile.properties.built = true;
+                solar_power -= cost;
+                updateHUD();
+            } else {
+                console.log("NOT ENOUGH POWER")
+            }
+        }
+
+        function updateHUD(){
+            HUDtext.setText("Solar power : " + solar_power)
+        }
+
 
         function render() {
             game.debug.text('Q = Restart\nR = Residence\nS = Solar', 32, 32, '#efefef');
