@@ -1,8 +1,40 @@
+#game_box {
+
+}
+
 #control_bar {
 background: rgb(40, 9, 79);
 color: white;
 padding: 10px;
 font-family: 'Proxima Nova Alt Bold';
+}
+
+.pull_right {
+    float:right;
+}
+
+.pull_right.end_turn {
+    background: rgb(0, 94, 140);
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: 0px 2px 1px #000;
+}
+
+.pull_right.end_turn:active {
+    box-shadow: 0px 0px 0px #000;
+}
+
+.pull_right.end_turn:hover {
+    box-shadow: 0px 2px 5px #000;
+}
+
+#control_bar span.warning {
+color:red;
+}
+
+#control_bar > div {
+    display: inline-block;
+    padding: 0 10px;
 }
 
 @font-face {

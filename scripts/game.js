@@ -9,7 +9,7 @@ requirejs.config({
 
 require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
     app = {}
-    var GAME_WIDTH = 600;
+    var GAME_WIDTH = window.innerWidth;
     var GAME_HEIGHT = 500;
     var TURN = 0;
     var map,
@@ -106,7 +106,6 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             }, this);
             end_turn_key = game.input.keyboard.addKey(Phaser.Keyboard.E);
             end_turn_key.onDown.add(function() {
-                mapdata = map.layers[0].data
                 end_turn(mapdata);
             }, this);
             debug_key = game.input.keyboard.addKey(Phaser.Keyboard.A);
@@ -171,7 +170,9 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         }
 
 
-        function end_turn(mapdata) {
+        function end_turn() {
+            HUD.lock(true);
+            mapdata = map.layers[0].data
             obj = {};
             obj.map = [];
             for (var i in mapdata) {
@@ -196,12 +197,13 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                     HUD.population(json.population)
                     HUD.max_population(json.max_population)
                     console.log("Loading new game")
+                    HUD.lock(false)
                 }
             })
         }
 
         function render() {
-            game.debug.text('Q = Restart\nR = Residence\nS = Solar', 32, 32, '#efefef');
+            game.debug.text('Q = Restart | R = Residence | S = Solar | E = End Turn', 32, 32, '#efefef');
         }
 
         // use this for all resources or turns or anything that needs to bind to the view
@@ -210,9 +212,31 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         // turn end, for instance.. 
         function HUDvm (){
             var self = this;
+            self.lock = ko.observable(false);
             self.solar_power = ko.observable(100);
             self.population = ko.observable(4);
             self.max_population = ko.observable(8);
+            self.overpopulated = ko.computed(function(){
+                return self.population() > self.max_population() ? true : false
+            })
+            self.happiness = ko.observable(100)
+            self.face = ko.computed(function(){
+                if (self.happiness() >= 75){
+                    return '<i class="icon-emo-grin"></i>'
+                } else if (self.happiness() < 75 && self.happiness() >= 50){
+                    return '<i class="icon-emo-happy"></i>'
+                } else if (self.happiness() < 50 && self.happiness() > 25) {
+                    return '<i class="icon-emo-unhappy"></i>'
+                } else if (self.happiness() <= 25 && self.happiness() > 0){
+                    return '<i class="icon-emo-angry"></i>'
+                } else if (self.happiness() == 0){
+                    return '<i class="icon-emo-shoot"></i>'
+                }
+            })
+            self.end_turn = function(){
+                end_turn();
+            }
+            self.newspaper = ko.observable("Extra extra, read all about it")
         }
 
 

@@ -18,6 +18,8 @@
         <!-- /ko -->
         <div id="game_box">
         </div>
+        <!-- ko template: { name: "under-template" } -->
+        <!-- /ko -->
     </div>
 </body>
 
@@ -30,7 +32,21 @@
 
 <script type="text/html" id="controls-template">
     <div id="control_bar">
-        <i class="icon-sun-inv"></i> <span data-bind="text:solar_power" />
-        <i class="icon-male"></i> <span data-bind="text:population" /> / <span data-bind="text:max_population" />
+        <div class="solar">
+            <i class="icon-sun-inv"></i> <span data-bind="text:solar_power" />
+        </div>
+        <div class="population">
+            <i class="icon-male"></i> <span data-bind="text:population, css: { warning: overpopulated }" /> <span>/</span> <span data-bind="text:max_population" />
+        </div>
+        <div class="happiness" data-bind="html: face">
+        </div>
+        <div class="pull_right end_turn" data-bind="click: end_turn">End Turn</div>
     </div>
+</script>
+
+<script type="text/html" id="under-template">
+    <div id="under_controls">
+        <div data-bind="text: (lock() == true) ? 'TURN ENDING' : newspaper"></div>
+    </div>
+    <pre data-bind="text: ko.toJSON($root, null, 2)"></pre> 
 </script>
