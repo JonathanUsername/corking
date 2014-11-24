@@ -10,7 +10,7 @@ app.config['DEBUG'] = True
 #current_directory = os.getcwd()
 #app._static_folder=current_directory
 # Temporary assumptions (to be updated when we can get a json file from the front end).
-no_tiles=1600
+no_tiles = 1600
 WIDTH = 40
 HEIGHT = 40
 DESERT = 30
@@ -49,11 +49,13 @@ def midpoint(length):
 def root():
     return render_template("index.html")
 
-@app.route("/newname")
-def new_name():
-#    ipdb.set_trace()
-    name = request.url.split("?")[1]
-    return name
+@app.route("/endturn", methods = ['POST'])
+def end_turn():
+    obj = {}
+    data = request.json
+    data['solar_power'] = replenishPower(data['solar_power'], data['map'])
+    print data
+    return json.dumps(data)
 
 @app.route("/newgame")
 def give_object_coordinates():
@@ -91,10 +93,19 @@ def give_object_coordinates():
                         }],
         "tilewidth":32,
         "version":1,
-        "width":WIDTH
+        "width":WIDTH,
+        "turn":0
         }
     return Response(json.dumps(js), mimetype='application/json')
 
+
+def replenishPower(amount,map_array):
+    panels = 0
+    for i,v in enumerate(map_array):
+        print i
+        if map_array[i] == 22:
+            panels += 1
+    return amount + (panels * 10) 
 
 
 # @app.route("/test")

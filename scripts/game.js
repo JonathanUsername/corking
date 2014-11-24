@@ -10,8 +10,8 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
     app = {}
     var GAME_WIDTH = 600;
     var GAME_HEIGHT = 500;
-    var solar_power = 100;
-    var BUILDING_INFO = {}
+    var SOLAR_POWER = 100;
+    var TURN = 0;
     var map,
         layer,
         marker,
@@ -53,28 +53,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
 
     get_new_game();
 
-    end_turn = function(mapdata) {
-        obj = {};
-        obj.map = stripCircular(mapdata);
-        obj.solar_power = solar_power;
-        var jsonSave = JSON.stringify(obj);
-        $.ajax({
-            url: "/endturn",
-            type: "POST",
-            data: jsonSave,
-            success: function(data) {
-                loaded_game = data;
-                console.log(JSON.stringify(data))
-                try {
-                    game.destroy()
-                    console.log("Loading new game")
-                } catch (e) {
-                    console.log("Game starting")
-                }
-                loadedLayer = data;
-            }
-        })
-    }
+
 
     start_game = function(loaded) {
         game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, '', {
@@ -87,7 +66,8 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         function preload() {
             var url = (loaded) ? null : 'data/desert.json';
             var data = loaded || null;
-            //debugger
+            TURN = data.turn
+                //debugger
             game.load.tilemap('desert', url, data, Phaser.Tilemap.TILED_JSON);
             game.load.tilemap('buildings', 'data/buildings.json', null, Phaser.Tilemap.TILED_JSON);
             game.load.image('tiles', 'tmw_desert_spacing.png');
@@ -182,20 +162,45 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         function placeBuilding(x, y, tile, layer, building) {
             var cost = BUILDING_INFO[building]["power_cost"]
             var b_tile = BUILDING_INFO[building]["tile"]
-            if (cost <= solar_power) {
+            if (cost <= SOLAR_POWER) {
                 map.putTile(b_tile, x, y, layer);
                 tile.properties.built = true;
-                solar_power -= cost;
+                SOLAR_POWER -= cost;
                 updateHUD();
             } else {
                 console.log("NOT ENOUGH POWER")
             }
         }
 
-        function updateHUD(){
-            HUDtext.setText("Solar power : " + solar_power)
+        function updateHUD() {
+            HUDtext.setText("Solar power : " + SOLAR_POWER)
         }
 
+        function end_turn(mapdata) {
+            obj = {};
+            obj.map = [];
+            for (var i in mapdata) {
+                for (var j in mapdata[i]) {
+                    obj.map.push(mapdata[i][j].index)
+                }
+            }
+            obj.turn = TURN;
+            obj.solar_power = SOLAR_POWER;
+            var jsonSave = JSON.stringify(obj, null, '\t');
+            $.ajax({
+                url: "/endturn",
+                type: "POST",
+                contentType: 'application/json;charset=UTF-8',
+                data: jsonSave,
+                success: function(data) {
+                    json = JSON.parse(data)
+                    loadedLayer = json.map;
+                    SOLAR_POWER = json.solar_power;
+                    updateHUD();
+                    console.log("Loading new game")
+                }
+            })
+        }
 
         function render() {
             game.debug.text('Q = Restart\nR = Residence\nS = Solar', 32, 32, '#efefef');
