@@ -17,23 +17,23 @@ DESERT = 30
 SOLAR = 22
 RESIDENT = 23
 
-def generate_desert(size):
+def get_map(size):
     #ipdb.set_trace()
-    desertmap = []
+    map = []
     for i in range(size):
-        desertmap.append(DESERT)
+        map.append(DESERT)
     # Add the initial solar panels
     #   S|R
     #   -+-
     #   R|S
     row_length = 1
     center = midpoint(WIDTH)+midpoint(WIDTH*HEIGHT)
-    desertmap[center] = SOLAR
-    desertmap[center + 1] = RESIDENT
-    desertmap[center + WIDTH] = RESIDENT
-    desertmap[center + WIDTH + 1] = SOLAR
+    map[center] = SOLAR
+    map[center + 1] = RESIDENT
+    map[center + WIDTH] = RESIDENT
+    map[center + WIDTH + 1] = SOLAR
 
-    return desertmap
+    return map
             
   
 
@@ -60,7 +60,7 @@ def give_object_coordinates():
     js = { "height":HEIGHT,
          "layers":[
                 {
-         "data" : generate_desert(no_tiles),
+         "data" : get_map(no_tiles),
          "height":HEIGHT,
                  "name":"Ground",
                  "opacity":1,
@@ -99,7 +99,7 @@ def give_object_coordinates():
 
 # @app.route("/test")
 # def test():
-#     return Response(json.dumps(generate_desert(1600)),mimetype='application/json')
+#     return Response(json.dumps(get_map(1600)),mimetype='application/json')
 
 if __name__ == "__main__":
         app.run(host="0.0.0.0", port=int("5000"))
