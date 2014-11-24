@@ -11,6 +11,23 @@
 </head>
 
 <body>
+    <div>
+        <!-- ko template: { name: "controls-template" } -->
+        <!-- /ko -->
+        <div id="game_box">
+        </div>
+    </div>
 </body>
 
 </html>
+
+
+
+
+<!-- TEMPLATES -->
+
+<script type="text/html" id="controls-template">
+<div id="control_bar">
+Solar power : <span data-bind="text: solar_power"/>
+</div>
+</script>

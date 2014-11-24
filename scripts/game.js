@@ -2,15 +2,15 @@ requirejs.config({
     baseUrl: 'scripts',
     paths: {
         Phaser: 'phaser',
-        jquery: 'jquery'
+        jquery: 'jquery',
+        knockout: 'knockout'
     },
 });
 
-require(['Phaser', 'jquery'], function(Phaser, $) {
+require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
     app = {}
     var GAME_WIDTH = 600;
     var GAME_HEIGHT = 500;
-    var SOLAR_POWER = 100;
     var TURN = 0;
     var map,
         layer,
@@ -22,6 +22,8 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         savedLayerOnEndTurn,
         loadedLayer,
         loaded_game = false;
+
+
 
     function stripCircular() {
         var obj = []
@@ -56,7 +58,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
 
 
     start_game = function(loaded) {
-        game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, '', {
+        game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, 'game_box', {
             preload: preload,
             create: create,
             update: update,
@@ -116,11 +118,15 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
             game.camera.x = 800 / 2; // Change this to what the maximum array size is in loaded data
             game.camera.y = 800 / 2;
 
+            // to be removed
             HUDtext = game.add.text(game.camera.x, game.camera.y, "Solar Power: 100", {
                 font: "15px Arial",
                 fill: "#ff0000",
                 align: "center"
             });
+
+            HUD = new HUDvm();
+            ko.applyBindings(HUD);
         }
 
         function update() {
@@ -162,10 +168,10 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         function placeBuilding(x, y, tile, layer, building) {
             var cost = BUILDING_INFO[building]["power_cost"]
             var b_tile = BUILDING_INFO[building]["tile"]
-            if (cost <= SOLAR_POWER) {
+            if (cost <= HUD.solar_power()) {
                 map.putTile(b_tile, x, y, layer);
                 tile.properties.built = true;
-                SOLAR_POWER -= cost;
+                HUD.solar_power(HUD.solar_power() - cost);
                 updateHUD();
             } else {
                 console.log("NOT ENOUGH POWER")
@@ -173,7 +179,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         }
 
         function updateHUD() {
-            HUDtext.setText("Solar power : " + SOLAR_POWER)
+            HUDtext.setText("Solar power : " + HUD.solar_power())
         }
 
         function end_turn(mapdata) {
@@ -185,7 +191,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
                 }
             }
             obj.turn = TURN;
-            obj.solar_power = SOLAR_POWER;
+            obj.solar_power = HUD.solar_power();
             var jsonSave = JSON.stringify(obj, null, '\t');
             $.ajax({
                 url: "/endturn",
@@ -195,8 +201,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
                 success: function(data) {
                     json = JSON.parse(data)
                     loadedLayer = json.map;
-                    SOLAR_POWER = json.solar_power;
-                    updateHUD();
+                    HUD.solar_power(json.solar_power)
                     console.log("Loading new game")
                 }
             })
@@ -205,6 +210,14 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
         function render() {
             game.debug.text('Q = Restart\nR = Residence\nS = Solar', 32, 32, '#efefef');
         }
+
+        // use this for all resources or turns or anything that needs to bind to the view
+        // it is a global variable called HUD
+        function HUDvm (){
+            var self = this;
+            self.solar_power = ko.observable(100);
+        }
+
 
     }
 });
