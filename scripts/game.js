@@ -93,6 +93,7 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
                     power_cost: 40
                 }
             }
+            BUILDING_TILES = [22,23];
             marker = game.add.graphics();
             marker.lineStyle(2, 0x000000, 1);
             marker.drawRect(0, 0, 32, 32);
@@ -131,8 +132,10 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
                 var xt = CurrentMap.getTileX(marker.x)
                 var yt = CurrentMap.getTileY(marker.y)
                 currentTile = map.getTile(xt, yt, CurrentMap);
-                if (currentTile == null || !currentTile.properties.built) {
-                    // Holding shift
+                if (BUILDING_TILES.indexOf(currentTile.index) != -1) {
+                    marker.lineStyle(2, 0xffffff, 1);
+                    console.log("You can't build on that! There's already a building there!")
+                } else {
                     if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
                         placeBuilding(xt, yt, currentTile, CurrentMap, "solar_panel")
                     } else if (game.input.keyboard.isDown(Phaser.Keyboard.R)) {
@@ -140,9 +143,6 @@ require(['Phaser', 'jquery'], function(Phaser, $) {
                     } else {
                         console.log(currentTile)
                     }
-                } else {
-                    marker.lineStyle(2, 0xffffff, 1);
-                    console.log("You can't build on that! There's already a building there!")
                 }
             }
 
