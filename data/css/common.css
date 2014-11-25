@@ -3,10 +3,37 @@
 }
 
 #control_bar {
-background: rgb(40, 9, 79);
-color: white;
-padding: 10px;
-font-family: 'Proxima Nova Alt Bold';
+    padding: 10px;
+}
+
+#under_controls {
+    padding: 10px;
+    height: 300px
+}
+
+.controls {
+    background: rgb(40, 9, 79);
+    color: white;
+    font-family: 'Proxima Nova Alt Bold';
+}
+
+.desktop {
+    padding: 20px;
+    background: rgba(0, 94, 140,0.5);
+}
+
+.desktop > div > div > span {
+    display: block;
+    margin: 5px 0;
+    cursor:pointer;
+}
+
+#under_controls div.row > div {
+    display:inline-block;
+    background: rgba(74, 164, 208, 0.5);
+    margin: 0 10px;
+    padding: 5px 10px;
+    cursor:pointer;
 }
 
 .pull_right {

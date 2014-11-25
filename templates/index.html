@@ -31,7 +31,7 @@
 <!-- TEMPLATES -->
 
 <script type="text/html" id="controls-template">
-    <div id="control_bar">
+    <div id="control_bar" class="controls">
         <div class="solar">
             <i class="icon-sun-inv"></i> <span data-bind="text:solar_power" />
         </div>
@@ -45,8 +45,25 @@
 </script>
 
 <script type="text/html" id="under-template">
-    <div id="under_controls">
-        <div data-bind="text: (lock() == true) ? 'TURN ENDING' : newspaper"></div>
+    <div id="under_controls" class="controls">
+        <div class="row">
+            <div data-bind="click: choose_newspaper">
+                News
+            </div>
+            <div data-bind="click: choose_buildings">
+                 Buildings
+            </div>
+        </div>
+        <div class="desktop">
+            <div data-bind="if: menu_choice() == 'buildings'">
+                <div data-bind="foreach: buildings">
+                    <span data-bind="text: name, click: change_selected_building">
+                </div>
+            </div>
+            <div data-bind="if: menu_choice() == 'newspaper'">
+                <div data-bind="text: (lock() == true) ? 'TURN ENDING' : newspaper"></div>
+            </div>
+        </div>
     </div>
-    <pre data-bind="text: ko.toJSON($root, null, 2)"></pre> 
+    <!-- <pre data-bind="text: ko.toJSON($root, null, 2)"></pre> -->
 </script>

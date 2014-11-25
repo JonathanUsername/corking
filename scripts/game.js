@@ -19,6 +19,8 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         cursors,
         game,
         Buildings,
+        BUILDING_TILES,
+        BUILDING_INFO,
         savedLayerOnEndTurn,
         loadedLayer,
         loaded_game = false;
@@ -85,14 +87,22 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             CurrentMap.resizeWorld();
             // Buildings = map.createBlankLayer("Buildings");
             // console.log(Buildings)
-            BUILDING_INFO = {
+            BUILDING_INFO = {   
                 "solar_panel": {
+                    index: 22,
                     tile: buildings.getTile(1, 0),
-                    power_cost: 30
+                    power_cost: 30,
+                    name: "Solar Panels",
+                    available: true,
+                    key: "solar_panel"
                 },
                 "residence": {
+                    index: 23,
                     tile: buildings.getTile(2, 0),
-                    power_cost: 40
+                    power_cost: 40,
+                    name: "Residential Pod",
+                    available: true,
+                    key: "residence"
                 }
             }
             BUILDING_TILES = [22,23];
@@ -134,10 +144,8 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                     marker.lineStyle(2, 0xffffff, 1);
                     console.log("You can't build on that! There's already a building there!")
                 } else {
-                    if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
-                        placeBuilding(xt, yt, currentTile, CurrentMap, "solar_panel")
-                    } else if (game.input.keyboard.isDown(Phaser.Keyboard.R)) {
-                        placeBuilding(xt, yt, currentTile, CurrentMap, "residence")
+                    if (HUD.selected_building() != false) {
+                        placeBuilding(xt, yt, currentTile, CurrentMap)
                     } else {
                         console.log(currentTile)
                     }
@@ -157,9 +165,9 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             }
         }
 
-        function placeBuilding(x, y, tile, layer, building) {
-            var cost = BUILDING_INFO[building]["power_cost"]
-            var b_tile = BUILDING_INFO[building]["tile"]
+        function placeBuilding(x, y, tile, layer) {
+            var cost = BUILDING_INFO[HUD.selected_building()]["power_cost"]
+            var b_tile =  BUILDING_INFO[HUD.selected_building()]['tile']
             if (cost <= HUD.solar_power()) {
                 map.putTile(b_tile, x, y, layer);
                 tile.properties.built = true;
@@ -235,12 +243,37 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                     return '<i class="icon-emo-shoot"></i>'
                 }
             })
+            self.building_info = ko.observable(BUILDING_INFO)
+            self.buildings = ko.observableArray()
+            for (var i in self.building_info()){
+                self.buildings.push(new MenuItem(BUILDING_INFO[i]))
+            }
+            self.selected_building = ko.observable(false);
+            self.menu_choice = ko.observable('buildings')
+            self.choose_newspaper = function(){
+                self.menu_choice('newspaper')
+            }
+            self.choose_buildings = function(){
+                self.menu_choice('buildings')
+            }            
             self.end_turn = function(){
                 end_turn();
             }
             self.newspaper = ko.observable("Extra extra, read all about it")
         }
 
+        function MenuItem(info){
+            var self = this
+            self.name = ko.observable(info.name)
+            self.key = ko.observable(info.key)
+            self.power_cost = ko.observable(info.power_cost)
+            self.index = ko.observable(info.index)
+            self.available = ko.observable(info.available)
+            self.tile = ko.observable(info.tile)
+            self.change_selected_building = function(){
+                HUD.selected_building(self.key())
+            }
+        }
 
     }
 });
