@@ -25,19 +25,19 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
 
 
 
-    function stripCircular() {
-        var obj = []
-        for (var i in mapdata) {
-            for (var j in mapdata[i]) {
-                // Get rid of circular properties
-                savedLayerOnEndTurn = mapdata[i][j].layer;
-                mapdata[i][j].layer = null;
-                mapdata[i][j].collisionCallbackContext = null;
-                obj.push(mapdata[i][j])
-            }
-        }
-        return obj
-    }
+    // function stripCircular() {
+    //     var obj = []
+    //     for (var i in mapdata) {
+    //         for (var j in mapdata[i]) {
+    //             // Get rid of circular properties
+    //             savedLayerOnEndTurn = mapdata[i][j].layer;
+    //             mapdata[i][j].layer = null;
+    //             mapdata[i][j].collisionCallbackContext = null;
+    //             obj.push(mapdata[i][j])
+    //         }
+    //     }
+    //     return obj
+    // }
 
     get_new_game = function() {
         $.get("/newgame", function(data) {
@@ -184,6 +184,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             obj.solar_power = HUD.solar_power();
             obj.population = HUD.population();
             obj.max_population = HUD.max_population();
+            obj.happiness = HUD.happiness();
             var jsonSave = JSON.stringify(obj, null, '\t');
             $.ajax({
                 url: "/endturn",
@@ -196,6 +197,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                     HUD.solar_power(json.solar_power)
                     HUD.population(json.population)
                     HUD.max_population(json.max_population)
+                    HUD.happiness(json.happiness)
                     console.log("Loading new game")
                     HUD.lock(false)
                 }

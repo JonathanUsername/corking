@@ -53,8 +53,9 @@ def root():
 def end_turn():
     obj = {}
     data = request.json
-    data['solar_power'] = calcPower(data['solar_power'], data['map'])
-    popObj = calcPop(data['population'], data['map'], data['max_population'])
+    data['solar_power'] = calcPower(data)
+    data['happiness'] = calcHappy(data)
+    popObj = calcPop(data)
     data['population'] = popObj['population']
     data['max_population'] = popObj['max_population']
     return json.dumps(data)
@@ -101,14 +102,30 @@ def give_object_coordinates():
     return Response(json.dumps(js), mimetype='application/json')
 
 
-def calcPower(amount,map_array):
+def calcPower(data):
+    amount = data['solar_power']
+    map_array = data['map']
     panels = 0
     for i,v in enumerate(map_array):
         if map_array[i] == SOLAR:
             panels += 1
-    return amount + (panels * 10) 
+    return amount + (panels * 10)
 
-def calcPop(population,map_array,current_max):
+def calcHappy(data):
+    happiness = data['happiness']
+    population = data['population']
+    max_population = data['max_population']    
+    if (population > max_population):
+        happiness = randomChange(happiness, 20, False) # False is superfluous, but just to show it's a negative change
+        if happiness < 0:
+            happiness = 0 # horrible, I know, but temporary
+    return happiness
+
+
+def calcPop(data):
+    population = data['population']
+    max_population = data['max_population']
+    map_array = data['map']
     residences = 0
     obj = { 
         'max_population': 0, 
@@ -118,12 +135,15 @@ def calcPop(population,map_array,current_max):
         if map_array[i] == RESIDENCE:
             residences += 1
     obj['max_population'] = (residences * 4)
-    obj['population'] = randomIncrease(population)
+    obj['population'] = randomChange(population, 3, True)
     return obj
 
-def randomIncrease(current):
+def randomChange(current, reasonable_max, positive):
     #reasonable_max = current / 5
-    inc = random.randint(current, current + 3)
+    if positive:
+        inc = random.randint(current, current + reasonable_max)
+    else:
+        inc = random.randint(current - reasonable_max, current)
     return inc 
 
 def percentof(whole, amount):
