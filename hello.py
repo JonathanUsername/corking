@@ -54,10 +54,12 @@ def end_turn():
     obj = {}
     data = request.json
     data['solar_power'] = calcPower(data)
-    data['happiness'] = calcHappy(data)
     popObj = calcPop(data)
     data['population'] = popObj['population']
     data['max_population'] = popObj['max_population']
+    data['solar_power'] = popObj['solar_power']
+    data['enough_power'] = popObj['enough_power']
+    data['happiness'] = calcHappy(data)
     return json.dumps(data)
 
 @app.route("/newgame")
@@ -111,32 +113,39 @@ def calcPower(data):
             panels += 1
     return amount + (panels * 10)
 
-def calcHappy(data):
-    happiness = data['happiness']
-    population = data['population']
-    max_population = data['max_population']    
-    if (population > max_population):
-        happiness = randomChange(happiness, 20, False) # False is superfluous, but just to show it's a negative change
-        if happiness < 0:
-            happiness = 0 # horrible, I know, but temporary
-    return happiness
-
-
 def calcPop(data):
     population = data['population']
     max_population = data['max_population']
     map_array = data['map']
+    solar = data['solar_power']
     residences = 0
     obj = { 
-        'max_population': 0, 
-        'population': 0 
+        'max_population': max_population, 
+        'population': population,
+        'solar_power': solar,
+        'enough_power': False
     }
     for i,v in enumerate(map_array):
         if map_array[i] == RESIDENCE:
             residences += 1
     obj['max_population'] = (residences * 4)
-    obj['population'] = randomChange(population, 3, True)
+    if solar > 100:
+        obj['solar_power'] = solar - 30
+        obj['population'] = randomChange(population, residences, True)
+        obj['enough_power'] = True
     return obj
+
+def calcHappy(data):
+    happiness = data['happiness']
+    population = data['population']
+    max_population = data['max_population']
+    # if (data['enough_power'] == False):
+    #     happiness = randomChange(happiness, 20, False)
+    if (population > max_population):
+        happiness = randomChange(happiness, 20, False) # False is superfluous, but just to show it's a negative change
+    if happiness < 0:
+        happiness = 0 # horrible, I know, but temporary
+    return happiness
 
 def randomChange(current, reasonable_max, positive):
     #reasonable_max = current / 5

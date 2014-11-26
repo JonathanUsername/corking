@@ -1,9 +1,13 @@
 #game_box {
-
+ margin-top:20px;
 }
 
 #control_bar {
     padding: 10px;
+    padding: 10px;
+position: fixed;
+width: 100%;
+top: 0;
 }
 
 #under_controls {
@@ -45,6 +49,7 @@
     border-radius: 3px;
     cursor: pointer;
     box-shadow: 0px 2px 1px #000;
+    margin-right: 30px;
 }
 
 .pull_right.end_turn:active {
