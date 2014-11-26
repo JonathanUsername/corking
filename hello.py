@@ -51,7 +51,6 @@ def root():
 
 @app.route("/endturn", methods = ['POST'])
 def end_turn():
-    obj = {}
     data = request.json
     data['solar_power'] = calcPower(data)
     popObj = calcPop(data)
@@ -103,6 +102,8 @@ def give_object_coordinates():
         }
     return Response(json.dumps(js), mimetype='application/json')
 
+
+# Functions to call on ended turn data. Basically, this is where the gameplay engine is. I've just made something as an example, but it would be good to keep everything as constants or a simple config object for easy tweaking later
 
 def calcPower(data):
     amount = data['solar_power']
@@ -158,9 +159,8 @@ def randomChange(current, reasonable_max, positive):
 def percentof(whole, amount):
     return amount * (float(whole)/100 )
 
-# @app.route("/test")
-# def test():
-#     return Response(json.dumps(get_map(1600)),mimetype='application/json')
+
+
 
 if __name__ == "__main__":
         app.run(host="0.0.0.0", port=int("5000"))

@@ -13,6 +13,12 @@
 </head>
 
 <body>
+    <div class="intro controls">
+        <div class="pre_game nasa">
+            <div class="game_title">OUTPOST 5</div>
+            <div class="new_game button">New Game</div>
+        </div>
+    </div>
     <div>
         <!-- ko template: { name: "controls-template" } -->
         <!-- /ko -->
@@ -37,9 +43,9 @@
         </div>
         <div class="population">
             <i class="icon-male"></i> 
-            <span data-bind="text:population, css: { warning: overpopulated }" /> 
-            <span>|</span> 
-            <span data-bind="text:max_population" />
+            <span data-bind="text:population, css: { warning: overpopulated }"></span> 
+            <span>/</span> 
+            <span data-bind="text:max_population"></span>
         </div>
         <div class="happiness" data-bind="html: face">
         </div>

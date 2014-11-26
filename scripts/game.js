@@ -55,9 +55,10 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         })
     }
 
-    get_new_game();
-
-
+    $(".new_game.button").click(function(){
+        $(".intro").hide()
+        get_new_game()
+    });
 
     start_game = function(loaded) {
         game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, 'game_box', {
@@ -112,20 +113,14 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             marker.lineStyle(2, 0x000000, 1);
             marker.drawRect(0, 0, 32, 32);
             cursors = game.input.keyboard.createCursorKeys();
-            restart_key = game.input.keyboard.addKey(Phaser.Keyboard.Q);
-            restart_key.onDown.add(function() {
-                get_new_game();
-            }, this);
-            end_turn_key = game.input.keyboard.addKey(Phaser.Keyboard.E);
-            end_turn_key.onDown.add(function() {
-                end_turn(mapdata);
-            }, this);
-            debug_key = game.input.keyboard.addKey(Phaser.Keyboard.A);
-            debug_key.onDown.add(function() {
-                GAME_WIDTH = 1200;
-                GAME_HEIGHT = 1200;
-                get_new_game();
-            }, this);
+
+            // debug_key = game.input.keyboard.addKey(Phaser.Keyboard.A);
+            // debug_key.onDown.add(function() {
+            //     GAME_WIDTH = 1200;
+            //     GAME_HEIGHT = 1200;
+            //     get_new_game();
+            // }, this);
+
             game.camera.x = 800 / 2; // Change this to what the maximum array size is in loaded data
             game.camera.y = 800 / 2;
 
