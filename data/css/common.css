@@ -1,5 +1,17 @@
+body {
+background: rgb(40, 9, 79);
+}
+
 #game_box {
- margin-top:20px;
+ margin:20px auto;
+}
+
+.game_wrapper {
+    background:#555;
+}
+
+#game_box canvas {
+    margin:0 auto;
 }
 
 #control_bar {

@@ -16,6 +16,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         layer,
         marker,
         currentTile,
+        GAME_ID,
         cursors,
         game,
         Buildings,
@@ -72,6 +73,8 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             var url = (loaded) ? null : 'data/desert.json';
             var data = loaded || null;
             TURN = data.turns
+            GAME_ID = data.game_id
+            console.log(GAME_ID)
                 //debugger
             game.load.tilemap('desert', url, data, Phaser.Tilemap.TILED_JSON);
             game.load.tilemap('buildings', 'data/buildings.json', null, Phaser.Tilemap.TILED_JSON);
@@ -128,7 +131,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             ko.applyBindings(HUD);
 
             music = game.add.audio('eno');
-            music.play();
+            // music.play();  it gets annoying
             music.loop = true;
         }
 

@@ -5,6 +5,7 @@ import random
 import math
 import ipdb
 import os
+import string
 app = Flask(__name__, static_folder='', static_url_path='')
 app.config['DEBUG'] = True
 #current_directory = os.getcwd()
@@ -98,9 +99,14 @@ def give_object_coordinates():
         "tilewidth":32,
         "version":1,
         "width":WIDTH,
-        "turn":0
+        "turn":0,
+        "game_id": id_generator()
         }
     return Response(json.dumps(js), mimetype='application/json')
+
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+   return ''.join(random.choice(chars) for _ in range(size))
+
 
 
 # Functions to call on ended turn data. Basically, this is where the gameplay engine is. I've just made something as an example, but it would be good to keep everything as constants or a simple config object for easy tweaking later
