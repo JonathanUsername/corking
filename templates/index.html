@@ -38,22 +38,23 @@
         <div class="population">
             <i class="icon-male"></i> 
             <span data-bind="text:population, css: { warning: overpopulated }" /> 
-            <span>/</span> 
+            <span>|</span> 
             <span data-bind="text:max_population" />
         </div>
         <div class="happiness" data-bind="html: face">
         </div>
-        <div class="pull_right end_turn" data-bind="click: end_turn">End Turn</div>
+        <div class="pull_right button" data-bind="click: music_toggle">Music</div>
+        <div class="pull_right button" data-bind="click: end_turn">End Turn</div>
     </div>
 </script>
 
 <script type="text/html" id="under-template">
     <div id="under_controls" class="controls">
         <div class="row">
-            <div data-bind="click: choose_newspaper">
+            <div data-bind="click: choose_newspaper, css: { selected_tab: menu_choice() == 'newspaper'}">
                 News
             </div>
-            <div data-bind="click: choose_buildings">
+            <div data-bind="click: choose_buildings, css: { selected_tab: menu_choice() == 'buildings'}">
                  Buildings
             </div>
         </div>
@@ -61,6 +62,9 @@
             <div data-bind="if: menu_choice() == 'buildings'">
                 <div data-bind="foreach: buildings">
                     <span data-bind="text: name, click: change_selected_building">
+                </div>
+                <div>
+                    <span data-bind="click: select_sell">SELL</span>
                 </div>
             </div>
             <div data-bind="if: menu_choice() == 'newspaper'">

@@ -75,6 +75,8 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             game.load.tilemap('desert', url, data, Phaser.Tilemap.TILED_JSON);
             game.load.tilemap('buildings', 'data/buildings.json', null, Phaser.Tilemap.TILED_JSON);
             game.load.image('tiles', 'tmw_desert_spacing.png');
+            // Need ogg for FF
+            game.load.audio('eno', ['data/audio/brian-eno-signals.mp3', 'data/audio/brian-eno-signals.ogg']);
         }
 
         function create() {
@@ -129,6 +131,10 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
 
             HUD = new HUDvm();
             ko.applyBindings(HUD);
+
+            music = game.add.audio('eno');
+            music.play();
+            music.loop = true;
         }
 
         function update() {
@@ -145,7 +151,11 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                     console.log("You can't build on that! There's already a building there!")
                 } else {
                     if (HUD.selected_building() != false) {
-                        placeBuilding(xt, yt, currentTile, CurrentMap)
+                        if (HUD.selected_building() == "sell"){
+                            console.log("Write selling code")
+                        } else {
+                            placeBuilding(xt, yt, currentTile, CurrentMap)
+                        }
                     } else {
                         console.log(currentTile)
                     }
@@ -249,13 +259,19 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                 self.buildings.push(new MenuItem(BUILDING_INFO[i]))
             }
             self.selected_building = ko.observable(false);
-            self.menu_choice = ko.observable('buildings')
+            self.menu_choice = ko.observable('buildings');
+            self.music_toggle = function(){
+                music.isPlaying ? music.stop() : music.play()
+            }
             self.choose_newspaper = function(){
                 self.menu_choice('newspaper')
             }
             self.choose_buildings = function(){
                 self.menu_choice('buildings')
-            }            
+            }
+            self.select_sell = function(){
+                self.selected_building("sell")
+            }
             self.end_turn = function(){
                 end_turn();
             }
