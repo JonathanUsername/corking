@@ -112,17 +112,17 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 
 def calcPower(data):
     amount = data['solar_power']
-    map_array = data['map']
+    map = data['map']
     panels = 0
-    for i,v in enumerate(map_array):
-        if map_array[i] == SOLAR:
+    for tile in map:
+        if tile['index'] == SOLAR:
             panels += 1
     return amount + (panels * 10)
 
 def calcPop(data):
     population = data['population']
     max_population = data['max_population']
-    map_array = data['map']
+    map = data['map']
     solar = data['solar_power']
     residences = 0
     obj = { 
@@ -131,8 +131,8 @@ def calcPop(data):
         'solar_power': solar,
         'enough_power': False
     }
-    for i,v in enumerate(map_array):
-        if map_array[i] == RESIDENCE:
+    for tile in map:
+        if tile['index'] == RESIDENCE:
             residences += 1
     obj['max_population'] = (residences * 4)
     if solar > 100:

@@ -181,6 +181,11 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             }
         }
 
+        function MapTile(index, properties){
+            var self = this;
+            self.index = index;
+            self.properties = properties;
+        }
 
         function end_turn() {
             HUD.lock(true);
@@ -189,7 +194,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             obj.map = [];
             for (var i in mapdata) {
                 for (var j in mapdata[i]) {
-                    obj.map.push(mapdata[i][j].index)
+                    obj.map.push(new MapTile(mapdata[i][j].index, mapdata[i][j].properties))
                 }
             }
             obj.turn = TURN;
@@ -229,7 +234,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             var count = 0
             for (var i in CurrentMap.layer.data){
                 for (var j in CurrentMap.layer.data[i]){
-                    CurrentMap.layer.data[i][j].index = new_map[count]
+                    CurrentMap.layer.data[i][j].index = new_map[count].index
                     count++
                 }
             }
