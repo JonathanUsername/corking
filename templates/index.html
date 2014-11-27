@@ -51,7 +51,7 @@
         </div>
         <div class="happiness" data-bind="html: face">
         </div>
-        <div class="pull_right button" data-bind="click: music_toggle">Music</div>
+        <div class="pull_right button music" data-bind="click: music_toggle, css: { off: music_on() == false }">Music</div>
         <div class="pull_right button" data-bind="click: end_turn">End Turn</div>
     </div>
 </script>
@@ -82,8 +82,11 @@
                     <span data-bind="click: select_sell">SELL</span>
                 </div>
             </div>
-            <div data-bind="if: menu_choice() == 'newspaper'">
-                <div data-bind="text: (lock() == true) ? 'TURN ENDING' : newspaper"></div>
+            <div class="newspaper" data-bind="if: menu_choice() == 'newspaper'">
+                <div data-bind="foreach: newspaper">
+                    <div data-bind="text: headline"></div>
+                    <div data-bind="text: article"></div>
+                </div>
             </div>
         </div>
     </div>

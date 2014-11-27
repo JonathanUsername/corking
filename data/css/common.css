@@ -33,12 +33,12 @@ top: 0;
 
 .building_menu_item {
     cursor: pointer;
+    padding:5px;
 }
 
-.building_menu_item:hover {
-cursor: pointer;
-color: rgb(40, 9, 79);
-background: rgba(243, 243, 243,0.5);
+.building_menu_item:hover:before {
+content: ">";
+margin-right: 5px;
 }
 
 .power_cost {
@@ -137,6 +137,14 @@ text-align: center;
 
 .pull_right.end_turn:hover {
     box-shadow: 0px 2px 5px #000;
+}
+
+.music.button.off {
+    text-decoration: line-through;
+}
+
+.music.button {
+    text-decoration: none;
 }
 
 #control_bar span.warning {

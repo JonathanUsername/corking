@@ -89,7 +89,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             currentTile = map.getTile(17, 16);
             CurrentMap = map.createLayer('Ground');
             CurrentMap.resizeWorld();
-            //Buildings = map.createBlankLayer("Buildings");
+            Placement = map.createBlankLayer("Placement");
             // console.log(Buildings)
             BUILDING_INFO = {   
                 "solar_panel": {
@@ -125,21 +125,25 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             game.camera.x = 800 / 2; // Change this to what the maximum array size is in loaded data
             game.camera.y = 800 / 2;
 
-            HUD = new HUDvm();
-            ko.applyBindings(HUD);
-
             music = game.add.audio('eno');
             // music.play();  it gets annoying
             music.loop = true;
+
+            HUD = new HUDvm();
+            ko.applyBindings(HUD);
+
         }
 
         function update() {
             marker.x = CurrentMap.getTileX(game.input.activePointer.worldX) * 32;
             marker.y = CurrentMap.getTileY(game.input.activePointer.worldY) * 32;
+            var xt = CurrentMap.getTileX(marker.x)
+            var yt = CurrentMap.getTileY(marker.y)
+            if (HUD.selected_building() != false){
+                
+            }
             if (game.input.mousePointer.isDown) {
                 // Within Buildings, not the ground layer
-                var xt = CurrentMap.getTileX(marker.x)
-                var yt = CurrentMap.getTileY(marker.y)
                 currentTile = map.getTile(xt, yt, CurrentMap);
                 if (BUILDING_TILES.indexOf(currentTile.index) != -1) {
                     marker.lineStyle(2, 0xffffff, 1);
@@ -216,6 +220,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                     HUD.population(json.population)
                     HUD.max_population(json.max_population)
                     HUD.happiness(json.happiness)
+                    HUD.newspaper(json.newspaper)
                     console.log("Loading new game")
                     HUD.lock(false)
                 }
@@ -282,8 +287,15 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             self.selected_building = ko.observable(false);
             self.menu_choice = ko.observable('buildings');
             self.music_toggle = function(){
-                music.isPlaying ? music.stop() : music.play()
+                if (music.isPlaying){
+                    music.stop()
+                    self.music_on(false)
+                } else{
+                    music.play()
+                    self.music_on(true)
+                } 
             }
+            self.music_on = ko.observable(false)
             self.choose_newspaper = function(){
                 self.menu_choice('newspaper')
             }
@@ -296,7 +308,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             self.end_turn = function(){
                 end_turn();
             }
-            self.newspaper = ko.observable("Extra extra, read all about it")
+            self.newspaper = ko.observableArray()
         }
 
         function MenuItem(info){

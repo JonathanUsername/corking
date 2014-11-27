@@ -18,6 +18,19 @@ DESERT = 30
 SOLAR = 22
 RESIDENCE = 23
 BUILDINGS = [SOLAR,RESIDENCE]
+ARTICLES = [{ 'headline': "The sun is so bright!",
+                'article':"The sun has been especially bright recently. So much so that the only, lonely flowers that we brought are now wilting."
+            },{ 'headline': "Testing", 
+            'article': "This is a test"
+            },{ 'headline': "Spate of headaches plagues base", 
+            'article':"I've got a headache, you've got a headache. Must be all this sun and the LACK OF ANY FOOD OR WATER..."
+            },{ 'headline': "Royal baby something something", 
+            'article' : "Blah blah blah the royal baby is something something"
+            }]
+RIOT_MSG = {
+'headline':"Riots break out in base!",
+'article':"Riots have been happening in the sector with coordinates "
+}
 
 def get_map(size):
     #ipdb.set_trace()
@@ -64,6 +77,7 @@ def end_turn():
     data['solar_power'] = popObj['solar_power']
     data['enough_power'] = popObj['enough_power']
     data['happiness'] = calcHappy(data)
+    data['newspaper'] = calcNewspaper(data)
     return json.dumps(data)
 
 @app.route("/newgame")
@@ -158,6 +172,17 @@ def calcHappy(data):
             if tile['index'] in BUILDINGS and random.randint(0,100) > 70:
                 tile['properties'] = { "rioting": True }
     return happiness
+
+def calcNewspaper(data):
+    happiness = data['happiness']
+    population = data['population']
+    map = data['map']
+    articles = []
+    for tile in map:
+        if "rioting" in tile['properties']:
+            articles.append(RIOT_MSG)
+    articles.append(ARTICLES[random.randint(0,(len(ARTICLES)-1))])
+    return articles
 
 def randomChange(current, reasonable_max, positive):
     #reasonable_max = current / 5
