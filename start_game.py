@@ -91,7 +91,11 @@ def get_map(size):
 #
 # -----------------------------------------------------------------------------------------
 def randomly_generate_terrain(map):
-    # code to be implemented
+    # Loop over the seed generation, up to a maximum number of seeds
+        # Generate seed index and its type
+        # Check that seed index is further than a predefined number of tiles from anything else <-- may replace with just checking that it does not lie on top of anything else
+        # Grow the seed, randomness involved in selecting 8 tiles around seed, don't grow if something else is already there
+        # Grow outer layers for a certain probability if below meansize and for a different probability if greater than meansize
     return map
 
 # -----------------------------------------------------------------------------------------
@@ -101,18 +105,38 @@ def randomly_generate_terrain(map):
 #
 # INPUTS            TYPE        DESCRIPTION
 #
-# lindex            int         The list index of the map.
+# lindex            int         The list index of the map. It starts with 0 and goes up to
+#                               (width*height - 1), where 0 corresponds to the top left
+#                               corner of the map and (width*height - 1) to the bottom 
+#                               right corner of the map.
+#
+# width             int         The width of the map.
+#
+# height            int         The height of the map.
 #
 #
 # OUTPUTS           TYPE        DESCRIPTION
 # 
-# x                 int         The x coordinate of the map list index inserted.
+# x                 int         The x coordinate of the map list index inserted, this goes
+#                               from 0 to (width - 1), where 0 corresponds to the left of 
+#                               the map and (width - 1) corresponds to the right of the
+#                               map.
 #
-# y                 int         The y coordinate of the map list index inserted.
+# y                 int         The y coordinate of the map list index inserted, this goes
+#                               from 0 to (height - 1), where 0 corresponds to the top of
+#                               the map and (height - 1) corresponds to the bottom of the
+#                               map (bitmap convension).
 #
 # -----------------------------------------------------------------------------------------
-def list_to_xy_coords(lindex):
-    # code to be implemented
+def list_to_xy_coords(lindex,width,height):
+    # test to make sure that lindex is within bounds
+    if (lindex >= 0 and lindex <= (width*height-1)):
+        x = lindex % width
+        y = (lindex - x)/width
+        return x,y
+    else: 
+        print "ERROR in converting from list index to x,y coordinates. List index outside allowed values."
+        return None, None
 
 
 # -----------------------------------------------------------------------------------------
@@ -122,19 +146,36 @@ def list_to_xy_coords(lindex):
 #
 # INPUTS            TYPE        DESCRIPTION
 #
-# x                 int         The x coordinate of the map.
+# x                 int         The x coordinate of the map, this goes from 0 to 
+#                               (width - 1), where 0 corresponds to the left of the map and
+#                               (width - 1) corresponds to the right of the map.
 #
-# y                 int         The y coordinate of the map.
+# y                 int         The y coordinate of the map, this goesf rom 0 to 
+#                               (height - 1), where 0 corresponds to the top of the map and
+#                               (height - 1) corresponds to the bottom of the map (bitmap 
+#                               convension).
+#
+# width             int         The width of the map.
+#
+# height            int         The height of the map.
 #
 #
 # OUTPUTS           TYPE        DESCRIPTION
 # 
-# lindex            int         The list index that corresponds to map coordinate x,y.
+# lindex            int         The list index that corresponds to map coordinate x,y. It
+#                               starts with 0 and goes up to (width*height - 1), where 0
+#                               corresponds to the top left corner of the map and
+#                               (width*height - 1) to the bottom right corner of the map.
+#                               
 #
 # -----------------------------------------------------------------------------------------
-def xy_coords_to_list(x,y):
-    # code to be implemented
-
+def xy_coords_to_list(x,y,width,height):
+    if (x>=0 and x<=(width-1) and y>=0 and y<=(height-1)): 
+        lindex = y*width + x
+        return lindex
+    else:
+        print "ERROR in converting from x,y map coordinates to list index. x or y coordinate outside allowed values."
+        return None
             
 def get_empty_map(size):
     map = []
