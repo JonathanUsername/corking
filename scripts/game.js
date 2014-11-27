@@ -12,8 +12,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
     var GAME_WIDTH = window.innerWidth;
     var GAME_HEIGHT = 500;
     var TURN = 0;
-    var map,
-        layer,
+    var layer,
         marker,
         currentTile,
         GAME_ID,
@@ -23,7 +22,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         BUILDING_TILES,
         BUILDING_INFO,
         savedLayerOnEndTurn,
-        loadedLayer,
+    //    loadedLayer,
         loaded_game = false;
 
 
@@ -45,7 +44,6 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
     get_new_game = function() {
         $.get("/newgame", function(data) {
             loaded_game = data;
-            console.log(JSON.stringify(data))
             try {
                 game.destroy()
                 console.log("Loading new game")
@@ -91,7 +89,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             currentTile = map.getTile(17, 16);
             CurrentMap = map.createLayer('Ground');
             CurrentMap.resizeWorld();
-            // Buildings = map.createBlankLayer("Buildings");
+            //Buildings = map.createBlankLayer("Buildings");
             // console.log(Buildings)
             BUILDING_INFO = {   
                 "solar_panel": {
@@ -140,7 +138,6 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             marker.y = CurrentMap.getTileY(game.input.activePointer.worldY) * 32;
             if (game.input.mousePointer.isDown) {
                 // Within Buildings, not the ground layer
-                console.log(CurrentMap)
                 var xt = CurrentMap.getTileX(marker.x)
                 var yt = CurrentMap.getTileY(marker.y)
                 currentTile = map.getTile(xt, yt, CurrentMap);
@@ -178,7 +175,6 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             var b_tile =  BUILDING_INFO[HUD.selected_building()]['tile']
             if (cost <= HUD.solar_power()) {
                 map.putTile(b_tile, x, y, layer);
-                tile.properties.built = true;
                 HUD.solar_power(HUD.solar_power() - cost);
             } else {
                 console.log("NOT ENOUGH POWER")
@@ -188,7 +184,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
 
         function end_turn() {
             HUD.lock(true);
-            mapdata = map.layers[0].data
+            mapdata = CurrentMap.layer.data
             obj = {};
             obj.map = [];
             for (var i in mapdata) {
@@ -210,6 +206,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                 success: function(data) {
                     json = JSON.parse(data)
                     loadedLayer = json.map;
+                    updateMap(json.map)
                     HUD.solar_power(json.solar_power)
                     HUD.population(json.population)
                     HUD.max_population(json.max_population)
@@ -222,6 +219,22 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
 
         function render() {
             game.debug.text('Q = Restart | R = Residence | S = Solar | E = End Turn', 32, 32, '#efefef');
+        }
+
+
+        // There must be a better way to do this...
+        // I'm mapping the single array passed by the backend, to the array of 
+        // arrays that phaser uses. Each 2nd dimension array has length 40.
+        function updateMap(new_map){
+            var count = 0
+            for (var i in CurrentMap.layer.data){
+                for (var j in CurrentMap.layer.data[i]){
+                    CurrentMap.layer.data[i][j].index = new_map[count]
+                    count++
+                }
+            }
+            // this is simply to interact with the map and trigger an update
+            map.replace(0,0) 
         }
 
         // use this for all resources or turns or anything that needs to bind to the view

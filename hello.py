@@ -33,10 +33,13 @@ def get_map(size):
     map[center + 1] = RESIDENCE
     map[center + WIDTH] = RESIDENCE
     map[center + WIDTH + 1] = SOLAR
-
     return map
             
-  
+def get_empty_map(size):
+    map = []
+    for i in range(size):
+        map.append(None)
+    return map
 
 def check_name(newname):
     # Later on add a database access to see if the name is already taken
@@ -64,44 +67,40 @@ def end_turn():
 
 @app.route("/newgame")
 def give_object_coordinates():
-    js = { "height":HEIGHT,
-         "layers":[
-                {
-         "data" : get_map(no_tiles),
-         "height":HEIGHT,
-                 "name":"Ground",
-                 "opacity":1,
-                 "type":"tilelayer",
-                 "visible":True,
-                 "width":WIDTH,
-                 "x":0,
-                 "y":0
-                }],"orientation":"orthogonal",
-        "properties":
-            {
-             },
-        "tileheight":32,
-        "tilesets":[
-                    {
-                        "firstgid":1,
-                        "image":"~/corking/tmw_desert_spacing.png",
-                        "imageheight":199,
-                        "imagewidth":265,
-                        "margin":1,
-                        "name":"Desert",
-                        "properties":
-                            {
-                         },
-                        "spacing":1,
-                        "tileheight":32,
-                        "tilewidth":32
-                        }],
-        "tilewidth":32,
-        "version":1,
-        "width":WIDTH,
-        "turn":0,
+    js = {
+        "height": HEIGHT,
+        "layers": [{
+            "data": get_map(no_tiles),
+            "height": HEIGHT,
+            "name": "Ground",
+            "opacity": 1,
+            "type": "tilelayer",
+            "visible": True,
+            "width": WIDTH,
+            "x": 0,
+            "y": 0
+        }],
+        "orientation": "orthogonal",
+        "properties": {},
+        "tileheight": 32,
+        "tilesets": [{
+            "firstgid": 1,
+            "image": "~/corking/tmw_desert_spacing.png",
+            "imageheight": 199,
+            "imagewidth": 265,
+            "margin": 1,
+            "name": "Desert",
+            "properties": {},
+            "spacing": 1,
+            "tileheight": 32,
+            "tilewidth": 32
+        }],
+        "tilewidth": 32,
+        "version": 1,
+        "width": WIDTH,
+        "turn": 0,
         "game_id": id_generator()
-        }
+    }
     return Response(json.dumps(js), mimetype='application/json')
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
