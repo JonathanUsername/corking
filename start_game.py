@@ -32,6 +32,25 @@ RIOT_MSG = {
 'article':"Riots have been happening in the sector with coordinates "
 }
 
+# -----------------------------------------------------------------------------------------
+# The function get_map returns the randomly generated map as an array. Used to set up the 
+# game. 
+#
+#
+# INPUTS            TYPE        DESCRIPTION
+#
+# size              int         The total number of tiles, i.e. width x height.
+#
+#
+# OUTPUTS           TYPE        DESCRIPTION
+# 
+# map               array       The randomly generated map returned as an array. The array
+#                               is ordered as row followed by row, stacked into an array,
+#                               starting from the top left corner of the map and finishing
+#                               at the bottom right corner of the map.
+#
+# -----------------------------------------------------------------------------------------
+
 def get_map(size):
     #ipdb.set_trace()
     map = []
@@ -47,7 +66,75 @@ def get_map(size):
     map[center + 1] = RESIDENCE
     map[center + WIDTH] = RESIDENCE
     map[center + WIDTH + 1] = SOLAR
+    # Add the randomly generated objects. 
+    randomly_generate_terrain(map)
+
     return map
+
+
+# -----------------------------------------------------------------------------------------
+# The function generate_random_terrain inputs randomly generated terrain into the map. It
+# sets seeds of certain types (e.g. plants, cacti, rocks, wastepiles) into the map, which 
+# each have certain properties (e.g. mean number of tiles occupied and probability of this
+# seed occuring). These seeds are put in random places and accepts or rejected based upon a
+# checks to make sure that nothing is already in the way.
+#
+#
+# INPUTS            TYPE        DESCRIPTION
+#
+# map               array       This is the map as it starts.
+#
+#
+# OUTPUTS           TYPE        DESCRIPTION
+# 
+# map               array       The map is returned with randomly generated terrain inside.
+#
+# -----------------------------------------------------------------------------------------
+def randomly_generate_terrain(map):
+    # code to be implemented
+    return map
+
+# -----------------------------------------------------------------------------------------
+# The function list_to_xy_coords is a mapping function that converts list indices into x
+# and y coordinates. 
+#
+#
+# INPUTS            TYPE        DESCRIPTION
+#
+# lindex            int         The list index of the map.
+#
+#
+# OUTPUTS           TYPE        DESCRIPTION
+# 
+# x                 int         The x coordinate of the map list index inserted.
+#
+# y                 int         The y coordinate of the map list index inserted.
+#
+# -----------------------------------------------------------------------------------------
+def list_to_xy_coords(lindex):
+    # code to be implemented
+
+
+# -----------------------------------------------------------------------------------------
+# The function xy_coords_to_list is a mapping function that converts x and y map
+# coordinates into the corresponding list index. 
+#
+#
+# INPUTS            TYPE        DESCRIPTION
+#
+# x                 int         The x coordinate of the map.
+#
+# y                 int         The y coordinate of the map.
+#
+#
+# OUTPUTS           TYPE        DESCRIPTION
+# 
+# lindex            int         The list index that corresponds to map coordinate x,y.
+#
+# -----------------------------------------------------------------------------------------
+def xy_coords_to_list(x,y):
+    # code to be implemented
+
             
 def get_empty_map(size):
     map = []
@@ -194,6 +281,8 @@ def randomChange(current, reasonable_max, positive):
 
 def percentof(whole, amount):
     return amount * (float(whole)/100 )
+
+def 
 
 
 
