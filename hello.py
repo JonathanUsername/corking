@@ -17,6 +17,7 @@ HEIGHT = 40
 DESERT = 30
 SOLAR = 22
 RESIDENCE = 23
+BUILDINGS = [SOLAR,RESIDENCE]
 
 def get_map(size):
     #ipdb.set_trace()
@@ -145,12 +146,17 @@ def calcHappy(data):
     happiness = data['happiness']
     population = data['population']
     max_population = data['max_population']
+    map = data['map']
     # if (data['enough_power'] == False):
     #     happiness = randomChange(happiness, 20, False)
     if (population > max_population):
         happiness = randomChange(happiness, 20, False) # False is superfluous, but just to show it's a negative change
     if happiness < 0:
         happiness = 0 # horrible, I know, but temporary
+    if happiness < 25:
+        for tile in map:
+            if tile['index'] in BUILDINGS and random.randint(0,100) > 70:
+                tile['properties'] = { "rioting": True }
     return happiness
 
 def randomChange(current, reasonable_max, positive):

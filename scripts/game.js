@@ -234,7 +234,12 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             var count = 0
             for (var i in CurrentMap.layer.data){
                 for (var j in CurrentMap.layer.data[i]){
-                    CurrentMap.layer.data[i][j].index = new_map[count].index
+                    var tile = CurrentMap.layer.data[i][j]
+                    tile.index = new_map[count].index
+                    tile.properties = new_map[count].properties
+                    if (tile.properties.rioting){
+                        tile.index = 38
+                    }
                     count++
                 }
             }

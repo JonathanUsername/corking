@@ -69,7 +69,14 @@
         <div class="desktop">
             <div data-bind="if: menu_choice() == 'buildings'">
                 <div data-bind="foreach: buildings">
-                    <span data-bind="text: name, click: change_selected_building">
+                    <div class="building_menu_item">
+                        <div class="name">
+                            <span data-bind="text: name, click: change_selected_building">
+                        </div>
+                        <div class="power_cost">
+                            <i class="icon-sun-inv"></i><span data-bind="text: power_cost">
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <span data-bind="click: select_sell">SELL</span>

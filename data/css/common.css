@@ -27,6 +27,25 @@ top: 0;
     height: 300px
 }
 
+.building_menu_item .name {
+    display:inline-block;
+}
+
+.building_menu_item {
+    cursor: pointer;
+}
+
+.building_menu_item:hover {
+cursor: pointer;
+color: rgb(40, 9, 79);
+background: rgba(243, 243, 243,0.5);
+}
+
+.power_cost {
+    display:inline-block;
+    margin-left: 20px;
+}
+
 .controls {
     background: rgb(40, 9, 79);
     color: white;
