@@ -13,11 +13,11 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
     var GAME_HEIGHT = 500;
     var TURN = 0;
     var layer,
-        marker,
+        //marker,
         currentTile,
         GAME_ID,
         cursors,
-        game,
+        //game,
         Buildings,
         BUILDING_TILES,
         BUILDING_INFO,
@@ -70,8 +70,8 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         function preload() {
             var url = (loaded) ? null : 'data/desert.json';
             var data = loaded || null;
-            TURN = data.turns
-            GAME_ID = data.game_id
+            // TURN = data.turns
+            // GAME_ID = data.game_id
             console.log(GAME_ID)
                 //debugger
             game.load.tilemap('desert', url, data, Phaser.Tilemap.TILED_JSON);
@@ -84,12 +84,15 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         function create() {
             map = game.add.tilemap('desert');
             buildings = game.add.tilemap('buildings');
-            desert = buildings.getTile(0, 0);
+            t_desert = buildings.getTile(0, 0);
+            t_solar = buildings.getTile(1, 0);
+            t_residence = buildings.getTile(2, 0);
+            t_fog = buildings.getTile(3,0)
             map.addTilesetImage('Desert', 'tiles');
             currentTile = map.getTile(17, 16);
             CurrentMap = map.createLayer('Ground');
             CurrentMap.resizeWorld();
-            Placement = map.createBlankLayer("Placement");
+            FogMap = map.createLayer('Fog');
             // console.log(Buildings)
             BUILDING_INFO = {   
                 "solar_panel": {
@@ -132,6 +135,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             HUD = new HUDvm();
             ko.applyBindings(HUD);
 
+            clearfog()
         }
 
         function update() {
@@ -156,6 +160,9 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                             placeBuilding(xt, yt, currentTile, CurrentMap)
                         }
                     } else {
+                        // var newtile = (map.getTile(xt,yt,FogMap))
+                        // newtile.alpha = 0
+                        // map.putTile(newtile,xt,yt,FogMap)
                         console.log(currentTile)
                     }
                 }
@@ -183,6 +190,35 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             } else {
                 console.log("NOT ENOUGH POWER")
             }
+            clearfog();
+        }
+
+        findBuildings = function(){
+            var arr = []
+            for (var y in map.layer.data){
+                for (var x in map.layer.data[y]){
+                    // if its index is in BUILDING_TILES then it's a building, this finds non-desert for now
+                    map.layer.data[y][x].index != 30 ? arr.push({"x":x,"y":y}) : false
+                }
+            }
+            return arr
+        }
+
+        getAdjacent = function(data, radius, layer){
+            var radius = radius || 1;
+            for (var i in data){
+               return data[i].x, data[i].y // unfinished
+            }
+
+        }
+
+        clearfog = function(){
+            var buildings = findBuildings()
+            for (var i in buildings){
+                var f_tile = map.getTile(buildings[i].x, buildings[i].y, FogMap)
+                f_tile.alpha = 0;
+                map.putTile(f_tile,buildings[i].x,buildings[i].y,FogMap)
+            }
         }
 
         function MapTile(index, properties){
@@ -193,7 +229,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
 
         function end_turn() {
             HUD.lock(true);
-            mapdata = CurrentMap.layer.data
+            mapdata = CurrentMap.layer.data // eventually should be for all layers
             obj = {};
             obj.map = [];
             for (var i in mapdata) {
@@ -250,6 +286,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             }
             // this is simply to interact with the map and trigger an update
             map.replace(0,0) 
+            clearfog();
         }
 
         // use this for all resources or turns or anything that needs to bind to the view
