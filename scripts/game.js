@@ -22,7 +22,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         BUILDING_TILES,
         BUILDING_INFO,
         savedLayerOnEndTurn,
-    //    loadedLayer,
+        loadedLayer,
         loaded_game = false;
 
 
@@ -195,6 +195,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
 
         findBuildings = function(){
             var arr = []
+            // Y FIRST ???? FFS!!!!
             for (var y in map.layer.data){
                 for (var x in map.layer.data[y]){
                     // if its index is in BUILDING_TILES then it's a building, this finds non-desert for now
@@ -204,20 +205,31 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             return arr
         }
 
-        getAdjacent = function(data, radius, layer){
+        getAdjacent = function(tile, radius, layer){
             var radius = radius || 1;
-            for (var i in data){
-               return data[i].x, data[i].y // unfinished
-            }
-
+            var arr = [
+                map.getTile(tile.x+1,tile.y+1,layer),
+                map.getTile(tile.x+1,tile.y,layer),
+                map.getTile(tile.x,tile.y+1,layer),
+                map.getTile(tile.x-1,tile.y-1,layer),
+                map.getTile(tile.x-1,tile.y,layer),
+                map.getTile(tile.x,tile.y-1,layer),
+                map.getTile(tile.x+1,tile.y-1,layer),
+                map.getTile(tile.x-1,tile.y+1,layer)
+            ]
+            return arr;
         }
 
         clearfog = function(){
-            var buildings = findBuildings()
+            var buildings = findBuildings();
             for (var i in buildings){
                 var f_tile = map.getTile(buildings[i].x, buildings[i].y, FogMap)
                 f_tile.alpha = 0;
                 map.putTile(f_tile,buildings[i].x,buildings[i].y,FogMap)
+                var adj = getAdjacent(f_tile,1,FogMap);
+                for (var i in adj){
+                    adj[i].alpha = 0;
+                }
             }
         }
 
