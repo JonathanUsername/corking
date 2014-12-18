@@ -79,6 +79,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             game.load.image('tiles', 'tmw_desert_spacing.png');
             // Need ogg for FF
             game.load.audio('eno', ['data/audio/brian-eno-signals.mp3', 'data/audio/brian-eno-signals.ogg']);
+            game.load.image('repair', 'data/img/repair.png');
         }
 
         function create() {
@@ -87,11 +88,11 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             t_desert = buildings.getTile(0, 0);
             t_solar = buildings.getTile(1, 0);
             t_residence = buildings.getTile(2, 0);
-            t_fog = buildings.getTile(3,0)
+            t_fog = buildings.getTile(3,0);
             map.addTilesetImage('Desert', 'tiles');
             currentTile = map.getTile(17, 16);
-            CurrentMap = map.createLayer('Ground');
-            CurrentMap.resizeWorld();
+            GroundMap = map.createLayer('Ground');
+            GroundMap.resizeWorld();
             FogMap = map.createLayer('Fog');
             // console.log(Buildings)
             BUILDING_INFO = {   
@@ -135,20 +136,36 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             HUD = new HUDvm();
             ko.applyBindings(HUD);
 
+            
+            units = game.add.group(undefined, "units");
+            repair = game.add.sprite(400, 300, 'repair', undefined, units);
+            repair.anchor.set(0.5);
+            console.log(t_fog.index)
+            game.physics.enable(repair)
+            // Set fog collision
+            map.setCollision(10,true,FogMap) 
+            // This will set (10, the fog for the moment) to call the hitFog function when collided with
+            map.setTileIndexCallback(t_fog.index, hitFog, this);
+
             clearfog()
+            repair.body.collideWorldBounds = true;
         }
 
         function update() {
-            marker.x = CurrentMap.getTileX(game.input.activePointer.worldX) * 32;
-            marker.y = CurrentMap.getTileY(game.input.activePointer.worldY) * 32;
-            var xt = CurrentMap.getTileX(marker.x)
-            var yt = CurrentMap.getTileY(marker.y)
+            marker.x = GroundMap.getTileX(game.input.activePointer.worldX) * 32;
+            marker.y = GroundMap.getTileY(game.input.activePointer.worldY) * 32;
+            var xt = GroundMap.getTileX(marker.x)
+            var yt = GroundMap.getTileY(marker.y)
+            // alert physics to collision between sprite and fog
+            game.physics.arcade.collide(repair,FogMap)
+
+
             if (HUD.selected_building() != false){
                 
             }
             if (game.input.mousePointer.isDown) {
                 // Within Buildings, not the ground layer
-                currentTile = map.getTile(xt, yt, CurrentMap);
+                currentTile = map.getTile(xt, yt, GroundMap);
                 if (BUILDING_TILES.indexOf(currentTile.index) != -1) {
                     marker.lineStyle(2, 0xffffff, 1);
                     console.log("You can't build on that! There's already a building there!")
@@ -157,7 +174,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
                         if (HUD.selected_building() == "sell"){
                             console.log("Write selling code")
                         } else {
-                            placeBuilding(xt, yt, currentTile, CurrentMap)
+                            placeBuilding(xt, yt, currentTile, GroundMap)
                         }
                     } else {
                         // var newtile = (map.getTile(xt,yt,FogMap))
@@ -193,6 +210,10 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             clearfog();
         }
 
+        function hitFog(){
+            console.log("FOG HIT!")
+        }
+
         findBuildings = function(){
             var arr = []
             // Y FIRST ???? FFS!!!!
@@ -220,15 +241,20 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
             return arr;
         }
 
+        function seenTile(tile){
+            tile.alpha = 0;
+            tile.properties["seen"] = true;
+        }
+
         clearfog = function(){
             var buildings = findBuildings();
             for (var i in buildings){
                 var f_tile = map.getTile(buildings[i].x, buildings[i].y, FogMap)
-                f_tile.alpha = 0;
+                seenTile(f_tile)
                 map.putTile(f_tile,buildings[i].x,buildings[i].y,FogMap)
                 var adj = getAdjacent(f_tile,1,FogMap);
                 for (var i in adj){
-                    adj[i].alpha = 0;
+                    seenTile(adj[i])
                 }
             }
         }
@@ -241,7 +267,7 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
 
         function end_turn() {
             HUD.lock(true);
-            mapdata = CurrentMap.layer.data // eventually should be for all layers
+            mapdata = GroundMap.layer.data // eventually should be for all layers
             obj = {};
             obj.map = [];
             for (var i in mapdata) {
@@ -285,9 +311,9 @@ require(['Phaser', 'jquery', 'knockout'], function(Phaser, $, ko) {
         // arrays that phaser uses. Each 2nd dimension array has length 40.
         function updateMap(new_map){
             var count = 0
-            for (var i in CurrentMap.layer.data){
-                for (var j in CurrentMap.layer.data[i]){
-                    var tile = CurrentMap.layer.data[i][j]
+            for (var i in GroundMap.layer.data){
+                for (var j in GroundMap.layer.data[i]){
+                    var tile = GroundMap.layer.data[i][j]
                     tile.index = new_map[count].index
                     tile.properties = new_map[count].properties
                     if (tile.properties.rioting){
